@@ -12,7 +12,7 @@ class GeneticModel:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=1, 
                  num_generations=1000, num_iterations_per_individual=10, start_timestep_evaluation=0, 
                  changeover_point_timestep=0, start_order=0, target_order=1, population_size=100, bounds=[-1, 1], 
-                 mutation_scale_factor=1, crossover_rate=0.5):
+                 mutation_scale_factor=1, crossover_rate=0.5, early_stopping_after_gens=None):
         self.radius = radius
         self.num_generations = num_generations
         self.num_iterations_per_individual = num_iterations_per_individual
@@ -29,6 +29,7 @@ class GeneticModel:
         self.bounds = bounds
         self.mutation_scale_factor = mutation_scale_factor
         self.crossover_rate = crossover_rate
+        self.early_stopping_after_gens = early_stopping_after_gens
 
         if any(ele is None for ele in domain_size) and (density == None or number_particles == None):
             raise Exception("If you do not suppy a domain_size, you need to provide both the density and the number of particles.")
@@ -108,7 +109,9 @@ class GeneticModel:
             for dict in log_dict_list:
                 w.writerow(dict.values())
             log.flush()
+            last_improvement_at_gen = 0
             for iter in range(self.num_generations):
+                print(f"gen {iter+1}/{self.num_generations}")
                 for ind in range(self.population_size):
                     candidates = [candidate for candidate in range(self.population_size) if candidate != ind]
                     a, b, c = population[np.random.choice(candidates, 3, replace=False)]
@@ -124,6 +127,7 @@ class GeneticModel:
                 if best_fitness < prev_fitness:
                     best_individual = population[np.argmin(fitnesses)]
                     prev_fitness = best_fitness
+                    last_improvement_at_gen = iter
                     print('Iteration: %d f([%s]) = %.5f' % (iter, np.around(best_individual, decimals=5), best_fitness))
                 # saving the fitnesses
                 if log_depth == 'all':
@@ -133,4 +137,7 @@ class GeneticModel:
                 for dict in log_dict_list:
                     w.writerow(dict.values())
                 log.flush()
+                if self.early_stopping_after_gens != None and iter-last_improvement_at_gen > self.early_stopping_after_gens:
+                    print(f"Early stopping at iteration {iter} after {self.early_stopping_after_gens} generations without improvement")
+                    break
             return [best_individual, best_fitness]

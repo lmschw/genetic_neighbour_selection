@@ -26,7 +26,8 @@ model = GeneticModel(radius=100,
                      number_particles=10, 
                      num_generations=10, 
                      num_iterations_per_individual=1,
-                     population_size=12)
+                     population_size=12,
+                     early_stopping_after_gens=2)
 
 best = model.run(save_path='test')
 print(f"BEST overall: {best}")
