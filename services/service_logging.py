@@ -26,20 +26,62 @@ def create_headers(len_c_values, is_best=False):
     return headers
 
 def initialise_log_file_with_headers(headers, save_path):
+    """
+    Appends the headers to the csv file.
+
+    Params:
+        - headers (list of strings): the headers to be inserted into the file
+        - save_path (string): the path of the file where the headers should be inserted
+
+    Returns:
+        Nothing.
+    """
     with open(save_path, 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(headers)
 
 def create_dicts_for_logging(iter, individuals, fitnesses):
+    """
+    Creates the dictionaries from the data.
+
+    Params:
+        - iter (int): the generation/iteration
+        - individuals (list of np.array): the individuals present in the current population
+        - fitnesses (list of floats): the fitness value of every individual in the population
+
+    Returns:
+        A list of dictionaries containing the information for all the individuals.
+    """
     dict_list = []
     for ind in range(len(individuals)):
         dict_list.append(create_dict(iter, ind, individuals[ind], fitnesses[ind]))
     return prepare_individuals_for_csv_logging(dict_list)
 
 def create_dict(iter, ind, c_values, fitness):
+    """
+    Creates a dictionary for an individual.
+
+    Params:
+        - iter (int): the generation
+        - ind (int): the index of the individual within the population
+        - c-values (np.array): the weights for all the orientations
+        - fitness (float): the fitness of the individual
+
+    Returns:
+        A dictionary.
+    """
     return {'iter': iter, 'ind': ind, 'individual': c_values, 'fitness': fitness}
 
 def prepare_individuals_for_csv_logging(dict_list):
+    """
+    Transforms all np.arrays into separate entries.
+
+    Params:
+        - dict_list (list of dictionaries): A list containing a dictionary for every data point (individual)
+
+    Returns:
+        A list of dictionaries containing no numpy arrays but instead spread to more items.
+    """
     new_dict_list = []
     for dict in dict_list:
         new_dict = {}
@@ -53,6 +95,17 @@ def prepare_individuals_for_csv_logging(dict_list):
     return new_dict_list
 
 def log_results_to_csv(dict_list, save_path, prepare=False):
+    """
+    Logs the results to a csv file.
+
+    Params:
+        - dict_list (list of dictionaries): A list containing a dictionary for every data point (individual)
+        - save_path (string): the path of the file where the headers should be inserted
+        - prepare (boolean) [optional, default=False]: whether or not the dictionaries need to be prepared, i.e. if they still contain numpy arrays
+
+    Returns:
+        Nothing.
+    """
     if prepare == True:
         dict_list = prepare_individuals_for_csv_logging(dict_list)
     with open(save_path, 'a', newline='') as f:

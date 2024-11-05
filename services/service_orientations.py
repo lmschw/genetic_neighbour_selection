@@ -44,9 +44,27 @@ def get_differences(array, domain_size):
     rij = rij - domain_size*np.rint(rij/domain_size) #minimum image convention
     return np.sum(rij**2,axis=2)
 
-def remove_diagonal(array):
-    return array[~np.eye(len(array), dtype=bool)].reshape(len(array), -1)
+def remove_diagonal(matrix):
+    """
+    Removes the diagnoal from a matrix.
+
+    Params:
+        - matrix (np.array): the matrix from which the diagonal should be removed
+
+    Returns:
+        The matrix without the diagonal.
+    """
+    return matrix[~np.eye(len(matrix), dtype=bool)].reshape(len(matrix), -1)
 
 def compute_global_order(orientations):
+    """
+    Computes the global order within the domain.
+
+    Params:
+        - orientations (np.array): the orientation of every particle in the domain
+
+    Returns:
+        The global order, a value in the range [0,1].
+    """
     sumOrientation = np.sum(orientations[np.newaxis,:,:],axis=1)
     return np.divide(np.sqrt(np.sum(sumOrientation**2,axis=1)), len(orientations))[0]

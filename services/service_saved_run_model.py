@@ -8,14 +8,13 @@ Service contains static methods to save and load models to/from json files.
 
 def save_model(simulation_data, path="sample.json", model_params=None, saveInterval=1):
     """
-    Saves a model trained by the Viscek simulator implementation.
+    Saves a run model.
 
     Parameters:
         - simulation_data (times, positions, orientations): the data to be saved
         - path (string) [optional]: the location and name of the target file
         - model_params (dict) [optional]: a summary of the model's params such as n, k, neighbourSelectionMode etc.
         - saveInterval (int) [optional]: specifies the interval at which the saving should occur, i.e. if any time steps should be skipped
-        - switchValues (array) [optional]: the switch type value assigned to each particle at every timestep
         
     Returns:
         Nothing. Creates or overwrites a file.
@@ -32,7 +31,6 @@ def load_model(path):
 
     Parameters:
         - path (string): the location and file name of the file containing the model data
-        - loadSwitchValues (boolean) [optional]: loads the switch type values from the save file
 
     Returns:
         The model's params as well as the simulation data containing the time, positions, orientations.
