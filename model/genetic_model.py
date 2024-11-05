@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.integrate as integrate
 import csv
+from sklearn import preprocessing
 
 from model.run_model import RunModel
 import services.service_preparation as sprep
@@ -52,14 +53,19 @@ class GeneticModel:
 
         print(f"dom={self.domain_size}, d={self.density}, n={self.number_particles}")
 
+    def __normalise(self, c_values):
+        normalised_vector = preprocessing.normalize(X=[c_values], norm='l2')[0]
+        return c_values/normalised_vector
+
+
     def __create_initial_population(self):
         return np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
 
     def __fitness_function(self, c_values):
         # TODO normalise c_values
         results = {t: [] for t in range(self.tmax)}
-        for i in range(self.num_generations):
-            if self.start_order == 1:
+        for i in range(self.num_iterations_per_individual):
+            if i < (self.num_iterations_per_individual/2):
                 initialState = sprep.create_ordered_initial_distribution_equidistanced_individual(domain_size=self.domain_size, number_particles=self.number_particles)
             else:
                 initialState = (None, None, None)
@@ -68,7 +74,7 @@ class GeneticModel:
                                 noise=self.noise,
                                 speed=self.speed,
                                 number_particles=self.number_particles,
-                                c_values=c_values)
+                                c_values=self.__normalise(c_values))
             simulation_data = simulator.simulate(tmax=self.tmax, initialState=initialState)
             _, _, orientations = simulation_data
             [results[t].append(sorient.compute_global_order(orientations[t])) for t in range(self.tmax)]
