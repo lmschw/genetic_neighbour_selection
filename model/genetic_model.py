@@ -11,7 +11,7 @@ import services.service_logging as slog
 
 class GeneticModel:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=1, 
-                 num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, start_timestep_evaluation=0, 
+                 num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, start_timestep_evaluation=0, 
                  changeover_point_timestep=0, start_order=0, target_order=1, population_size=100, bounds=[-1, 1], 
                  mutation_scale_factor=1, crossover_rate=0.5, early_stopping_after_gens=None):
         self.radius = radius
@@ -23,6 +23,7 @@ class GeneticModel:
 
         self.tmax = tmax
         self.add_own_orientation = add_own_orientation
+        self.add_random = add_random
         self.start_timestep_evaluation = start_timestep_evaluation
         self.changeover_point_timestep = changeover_point_timestep
         self.start_order = start_order
@@ -53,6 +54,8 @@ class GeneticModel:
         self.c_value_size = (self.number_particles-1) * 3
         if self.add_own_orientation:
             self.c_value_size += 1
+        if self.add_random:
+            self.c_value_size += 1
 
         print(f"dom={self.domain_size}, d={self.density}, n={self.number_particles}")
 
@@ -76,7 +79,9 @@ class GeneticModel:
                                 noise=self.noise,
                                 speed=self.speed,
                                 number_particles=self.number_particles,
-                                c_values=self.__normalise(c_values))
+                                c_values=self.__normalise(c_values),
+                                add_own_orientation=self.add_own_orientation,
+                                add_random=self.add_random)
             simulation_data = simulator.simulate(tmax=self.tmax, initialState=initialState)
             _, _, orientations = simulation_data
             [results[t].append(sorient.compute_global_order(orientations[t])) for t in range(self.tmax)]

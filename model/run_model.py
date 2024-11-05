@@ -7,7 +7,7 @@ class RunModel:
     """
     Performs the actual simulation of the agents interacting in the domain.
     """
-    def __init__(self, domain_size, radius, noise, speed, number_particles, c_values, add_own_orientation=False):
+    def __init__(self, domain_size, radius, noise, speed, number_particles, c_values, add_own_orientation=False, add_random=False):
         self.domain_size = np.array(domain_size)
         self.radius = radius
         self.noise = noise
@@ -15,6 +15,7 @@ class RunModel:
         self.number_particles = number_particles
         self.c_values = c_values
         self.add_own_orientation = add_own_orientation
+        self.add_random = add_random
 
     def get_parameter_summary(self):
         return {"domain_size": self.domain_size.tolist(),
@@ -23,7 +24,8 @@ class RunModel:
                 "speed": self.speed,
                 "number_particles": self.number_particles,
                 "c_values": self.c_values.tolist(),
-                "add_own_orientation": self.add_own_orientation}
+                "add_own_orientation": self.add_own_orientation,
+                "add_random": self.add_random}
         
     def initialize_state(self):
         """
@@ -77,6 +79,8 @@ class RunModel:
         orients = np.append(orients, orientations_by_bearing, axis=1)
         if self.add_own_orientation == True:
             orients = np.append(orients, orientations[:, np.newaxis, :], axis=1)
+        if self.add_random == True:
+            orients = np.append(np.random.uniform(low=-1, high=1, size=(self.number_particles, 2)))
         return orients
     
     def compute_new_orientations(self, positions, orientations):
