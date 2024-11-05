@@ -1,8 +1,11 @@
 import csv
 import numpy as np
 
-def create_headers(num_individuals):
-    headers = ['iter', 'ind']
+def create_headers(num_individuals, is_best=False):
+    if is_best:
+        headers = ['iter']
+    else:
+        headers = ['iter', 'ind']
     individual_headers = [f"individual_{i}" for i in range((num_individuals-1)*3)]
     headers.extend(individual_headers)
     headers.append('fitness')
