@@ -146,7 +146,7 @@ class RunModel:
         """
        
         positions, orientations = self.prepare_simulation(initialState=initialState, dt=dt, tmax=tmax)
-        print(f"t=start, order={sorient.compute_global_order(orientations)}")
+        #print(f"t=start, order={sorient.compute_global_order(orientations)}")
         
         for t in range(self.num_intervals):
             self.t = t
@@ -162,11 +162,7 @@ class RunModel:
             self.positions_history[t,:,:]=positions
             self.orientations_history[t,:,:]=orientations
 
-            if t % 500 == 0:
-                print(f"t={t}, order={sorient.compute_global_order(orientations)}")
-
             # if t % 500 == 0:
-            #     print(f"t={t}, th={self.thresholdEvaluationMethod.name}, order={ServiceMetric.computeGlobalOrder(orientations)}")
-            
+            #     print(f"t={t}, order={sorient.compute_global_order(orientations)}")
 
         return (self.dt*np.arange(self.num_intervals), self.positions_history, self.orientations_history)
