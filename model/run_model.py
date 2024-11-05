@@ -8,6 +8,17 @@ class RunModel:
     Performs the actual simulation of the agents interacting in the domain.
     """
     def __init__(self, domain_size, radius, noise, speed, number_particles, c_values, add_own_orientation=False, add_random=False):
+        """
+        Params:
+            - domain_size (tuple of floats) [optional]: the dimensions of the domain
+            - radius (int): the perception radius of the particles
+            - noise (float): the amount of environmental noise in the domain
+            - speed (float): how fast the particles move
+            - number_particles (int): how many particles are within the domain
+            - c_values (np.array): the weights for the orientations
+            - add_own_orientation (boolean) [optional, default=False]: should the particle's own orientation be considered (added to weights and orientations)
+            - add_random (boolean) [optional, default=False]: should a random value be considered (added to weights and orientations). Orientation value generated randomly at every timestep
+        """
         self.domain_size = np.array(domain_size)
         self.radius = radius
         self.noise = noise
@@ -55,6 +66,18 @@ class RunModel:
         return np.random.normal(scale=self.noise, size=(self.number_particles, len(self.domain_size)))
     
     def __create_sorted_orientations_array(self, positions, orientations):
+        """
+        Sorts the orientations by orientation differences, distances and bearings. Then combines these three rankings into a single array and adds the particle's
+        own orientation and a random orientation as needed.
+
+        Params:
+            - positions (np.array): the position of every particle at the current timestep
+            - orientations (np.array): the orientation of every particle at the current timestep
+
+        Returns:
+            A numpy array containing the orientations of all particles to correspond to the c_values.
+        """
+
         # we remove the diagonal after the sorting to remove the particle's own information
         diagonal_mask = np.full((self.number_particles, self.number_particles), False)
         np.fill_diagonal(diagonal_mask, True)
@@ -84,13 +107,31 @@ class RunModel:
         return orients
     
     def compute_new_orientations(self, positions, orientations):
-        # TODO implement c_values logic and apply mean + normalisation
+        """
+        Updates the orientations in accordance with the c_values.
+
+        Params:
+            - positions (np.array): the position of every particle at the current timestep
+            - orientations (np.array): the orientation of every particle at the current timestep
+
+        Returns:
+            A numpy array containing the new orientation of every particle.
+        """
         sorted_orientations = self.__create_sorted_orientations_array(positions=positions, orientations=orientations)
         applied_orientations = np.tensordot(sorted_orientations, self.c_values, axes=(1, 0))
 
         return sorient.normalize_orientations(applied_orientations)
     
     def compute_bearings(self, positions):
+        """
+        Computes the bearings for every particle.
+
+        Params:
+            - positions (np.array): the position of every particle at the current timestep
+
+        Returns:
+            Numpy array containing the bearings of all particles. Values between [-pi, pi]
+        """
         xDiffs = positions[:,0,np.newaxis]-positions[np.newaxis,:,0]
         yDiffs = positions[:,1,np.newaxis]-positions[np.newaxis,:,1]
 
