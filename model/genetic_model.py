@@ -1,12 +1,12 @@
 import numpy as np
 import scipy.integrate as integrate
 import csv
-from sklearn import preprocessing
 
 from model.run_model import RunModel
 import services.service_preparation as sprep
 import services.service_orientations as sorient
 import services.service_logging as slog
+import services.service_helper as shelp
 
 
 class GeneticModel:
@@ -59,11 +59,6 @@ class GeneticModel:
 
         print(f"dom={self.domain_size}, d={self.density}, n={self.number_particles}")
 
-    def __normalise(self, c_values):
-        normalised_vector = preprocessing.normalize(X=[c_values], norm='l2')[0]
-        return c_values/normalised_vector
-
-
     def __create_initial_population(self):
         return np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
 
@@ -79,7 +74,7 @@ class GeneticModel:
                                 noise=self.noise,
                                 speed=self.speed,
                                 number_particles=self.number_particles,
-                                c_values=self.__normalise(c_values),
+                                c_values=shelp.normalise(c_values),
                                 add_own_orientation=self.add_own_orientation,
                                 add_random=self.add_random)
             simulation_data = simulator.simulate(tmax=self.tmax, initialState=initialState)

@@ -4,6 +4,7 @@ from model.run_model import RunModel
 from model.genetic_model import GeneticModel
 import services.service_preparation as sprep
 import services.service_logging as slog
+import services.service_helper as shelp
 
 
 # c_values = np.array([0, 0, 0, 0, 0, 1, 0, 0, 0]) # farthest
@@ -19,10 +20,14 @@ import services.service_logging as slog
 # slog.initialise_log_file_with_headers(slog.create_headers(4), save_path)
 # slog.log_results_to_csv(vals, save_path, prepare=True)
 
-save_path_best = 'best.csv'
-save_path_general = 'test'
+postfix = ""
+
+save_path_best = f"best{postfix}.csv"
+save_path_best_normalised = f"best{postfix}_normalised.csv"
+save_path_general = f"test{postfix}"
 
 slog.initialise_log_file_with_headers(slog.create_headers(10, is_best=True), save_path=save_path_best)
+slog.initialise_log_file_with_headers(slog.create_headers(10, is_best=True), save_path=save_path_best_normalised)
 
 for i in range(10):
     model = GeneticModel(radius=100, 
@@ -42,5 +47,6 @@ for i in range(10):
 
 
     slog.log_results_to_csv([{'iter': i, 'individual': np.array(best[0]), 'fitness': best[1]}], prepare=True, save_path=save_path_best)
+    slog.log_results_to_csv([{'iter': i, 'individual': shelp.normalise(np.array(best[0])), 'fitness': best[1]}], prepare=True, save_path=save_path_best)
 
 
