@@ -20,7 +20,9 @@ import services.service_helper as shelp
 # slog.initialise_log_file_with_headers(slog.create_headers(4), save_path)
 # slog.log_results_to_csv(vals, save_path, prepare=True)
 
-postfix = ""
+postfix = "_own"
+
+print(postfix)
 
 save_path_best = f"best{postfix}.csv"
 save_path_best_normalised = f"best{postfix}_normalised.csv"
@@ -34,7 +36,7 @@ for i in range(10):
                         tmax=1000, 
                         density=0.01, 
                         number_particles=10,
-                        add_own_orientation=False,
+                        add_own_orientation=True,
                         add_random=False, 
                         num_generations=20, 
                         num_iterations_per_individual=10,
