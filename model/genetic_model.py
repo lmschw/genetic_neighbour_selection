@@ -10,10 +10,33 @@ import services.service_helper as shelp
 
 
 class GeneticModel:
-    def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=1, 
+    def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
                  num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, start_timestep_evaluation=0, 
-                 changeover_point_timestep=0, start_order=0, target_order=1, population_size=100, bounds=[-1, 1], 
+                 changeover_point_timestep=0, start_order=None, target_order=1, population_size=100, bounds=[-1, 1], 
                  mutation_scale_factor=1, crossover_rate=0.5, early_stopping_after_gens=None):
+        """
+        Models the DE approach.
+
+        Params:
+            - radius (int): the perception radius of the particles
+            - tmax (int): the number of timesteps for each simulation
+            - domain_size (tuple of floats) [optional]: the dimensions of the domain
+            - density (float) [optional]: the density of the particles within the domain
+            - number_particles (int) [optional]: how many particles are within the domain
+            - speed (float) [optional, default=1]: how fast the particles move
+            - noise_percentage (float) [optional, default=0]: how much environmental noise is present in the domain
+            - num_generations (int) [optional, default=1000]: how many generations are generated and validated
+            - num_iterations_per_individual (int) [optional, default=10]: how many times the simulation is run for every individual
+            - add_own_orientation (boolean) [optional, default=False]: should the particle's own orientation be considered (added to weights and orientations)
+            - add_random (boolean) [optional, default=False]: should a random value be considered (added to weights and orientations). Orientation value generated randomly at every timestep
+            - start_timestep_evaluation (int) [optional, default=0]: the first timestep for which the difference between expected and actual result should be computed
+            - changeover_point_timestep (int) [optional, default=0]: if we expect a change in the order, this indicated the timestep for that change
+            - start_order (int: 0 or 1) [optional]: the order at the start. If this is not set, half the simulation runs are started with an ordered starting condition and half with a disordered starting condition
+            - target_order (int: 0 or 1) [optional, default=1]: the expected order at the end
+            - population_size (int) [optional, default=100]: how many individuals are generated per generation
+            - bounds (list of 2 ints) [optional, default=[-1, 1]]: the bounds for the c_value generation
+        """
+
         self.radius = radius
         self.num_generations = num_generations
         self.num_iterations_per_individual = num_iterations_per_individual
@@ -65,7 +88,7 @@ class GeneticModel:
     def __fitness_function(self, c_values):
         results = {t: [] for t in range(self.tmax)}
         for i in range(self.num_iterations_per_individual):
-            if i < (self.num_iterations_per_individual/2):
+            if self.start_order == 1 or (self.start_order == None and i < (self.num_iterations_per_individual/2)):
                 initialState = sprep.create_ordered_initial_distribution_equidistanced_individual(domain_size=self.domain_size, number_particles=self.number_particles)
             else:
                 initialState = (None, None, None)
