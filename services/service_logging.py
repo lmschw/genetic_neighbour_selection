@@ -1,12 +1,26 @@
 import csv
 import numpy as np
 
-def create_headers(num_individuals, is_best=False):
+"""
+Service containing methods to do with logging.
+"""
+
+def create_headers(len_c_values, is_best=False):
+    """
+    Creates the headers for the csv file.
+
+    Params:
+        - len_c_values (int): how many values are in the c_values
+        - is_best (boolean): if the log is meant for the best result or for individual results
+
+    Returns:
+        A list containing all the headers.
+    """
     if is_best:
         headers = ['iter']
     else:
         headers = ['iter', 'ind']
-    individual_headers = [f"individual_{i}" for i in range((num_individuals-1)*3)]
+    individual_headers = [f"individual_{i}" for i in range(len_c_values)]
     headers.extend(individual_headers)
     headers.append('fitness')
     return headers

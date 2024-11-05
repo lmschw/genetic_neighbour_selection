@@ -28,8 +28,19 @@ save_path_best = f"best{postfix}.csv"
 save_path_best_normalised = f"best{postfix}_normalised.csv"
 save_path_general = f"test{postfix}"
 
-slog.initialise_log_file_with_headers(slog.create_headers(10, is_best=True), save_path=save_path_best)
-slog.initialise_log_file_with_headers(slog.create_headers(10, is_best=True), save_path=save_path_best_normalised)
+n = 10
+add_own = True
+add_random = False
+
+num_c_values = 3 * (n-1)
+if add_own:
+    num_c_values += 1
+if add_random:
+    num_c_values += 1
+
+
+slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True), save_path=save_path_best)
+slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True), save_path=save_path_best_normalised)
 
 for i in range(10):
     model = GeneticModel(radius=100, 
@@ -37,8 +48,8 @@ for i in range(10):
                         density=0.01, 
                         number_particles=10,
                         noise_percentage=0,
-                        add_own_orientation=True,
-                        add_random=False, 
+                        add_own_orientation=add_own,
+                        add_random=add_random, 
                         num_generations=20, 
                         num_iterations_per_individual=10,
                         population_size=20,

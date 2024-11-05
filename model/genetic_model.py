@@ -128,7 +128,7 @@ class GeneticModel:
     def run(self, save_path=None, log_depth='all'):
         with open(f"{save_path}.csv", 'a', newline='') as log:
             w = csv.writer(log)
-            headers = slog.create_headers(self.number_particles)
+            headers = slog.create_headers(self.c_value_size)
             w.writerow(headers)
             log.flush()
             population  = self.__create_initial_population()
