@@ -11,7 +11,7 @@ import services.service_logging as slog
 
 class GeneticModel:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=1, 
-                 num_generations=1000, num_iterations_per_individual=10, start_timestep_evaluation=0, 
+                 num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, start_timestep_evaluation=0, 
                  changeover_point_timestep=0, start_order=0, target_order=1, population_size=100, bounds=[-1, 1], 
                  mutation_scale_factor=1, crossover_rate=0.5, early_stopping_after_gens=None):
         self.radius = radius
@@ -22,6 +22,7 @@ class GeneticModel:
         self.noise = sprep.get_noise_amplitude_value_for_percentage(self.noise_percentage)
 
         self.tmax = tmax
+        self.add_own_orientation = add_own_orientation
         self.start_timestep_evaluation = start_timestep_evaluation
         self.changeover_point_timestep = changeover_point_timestep
         self.start_order = start_order
@@ -50,6 +51,8 @@ class GeneticModel:
             self.domain_size = sprep.get_domain_size_for_constant_density(self.density, self.number_particles)
 
         self.c_value_size = (self.number_particles-1) * 3
+        if self.add_own_orientation:
+            self.c_value_size += 1
 
         print(f"dom={self.domain_size}, d={self.density}, n={self.number_particles}")
 
@@ -62,7 +65,6 @@ class GeneticModel:
         return np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
 
     def __fitness_function(self, c_values):
-        # TODO normalise c_values
         results = {t: [] for t in range(self.tmax)}
         for i in range(self.num_iterations_per_individual):
             if i < (self.num_iterations_per_individual/2):
