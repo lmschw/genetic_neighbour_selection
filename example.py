@@ -19,17 +19,24 @@ import services.service_logging as slog
 # slog.initialise_log_file_with_headers(slog.create_headers(4), save_path)
 # slog.log_results_to_csv(vals, save_path, prepare=True)
 
+slog.initialise_log_file_with_headers(slog.create_headers(10, is_best=True), save_path='best.csv')
 
-model = GeneticModel(radius=100, 
-                     tmax=1000, 
-                     density=0.01, 
-                     number_particles=10, 
-                     num_generations=10, 
-                     num_iterations_per_individual=1,
-                     population_size=12,
-                     early_stopping_after_gens=10,
-                     start_order=1,
-                     target_order=0)
+for i in range(1):
+    model = GeneticModel(radius=100, 
+                        tmax=1000, 
+                        density=0.01, 
+                        number_particles=10, 
+                        num_generations=1, 
+                        num_iterations_per_individual=10,
+                        population_size=10,
+                        early_stopping_after_gens=None,
+                        start_order=0,
+                        target_order=1)
 
-best = model.run(save_path='test')
-print(f"BEST overall: {best}")
+    best = model.run(save_path='test_1')
+    print(f"BEST overall: {best}")
+
+
+    slog.log_results_to_csv([{'iter': i, 'individual': np.array(best[0]), 'fitness': best[1]}], prepare=True, save_path='best.csv')
+
+
