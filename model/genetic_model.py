@@ -64,8 +64,8 @@ class GeneticModel:
                                 speed=self.speed,
                                 number_particles=self.number_particles,
                                 c_values=c_values)
-            simulationData = simulator.simulate(tmax=self.tmax)
-            _, _, orientations = simulationData
+            simulation_data = simulator.simulate(tmax=self.tmax)
+            _, _, orientations = simulation_data
             [results[t].append(sorient.compute_global_order(orientations[t])) for t in range(self.tmax)]
         resultsArr = [np.average(results[t]) for t in range(self.tmax)]
         target = (self.changeover_point_timestep) * [self.start_order] + (self.tmax-self.changeover_point_timestep) * [self.target_order]

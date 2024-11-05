@@ -16,7 +16,7 @@ class RunModel:
         self.c_values = c_values
 
     def get_parameter_summary(self):
-        return {"domain_size": self.domain_size,
+        return {"domain_size": self.domain_size.tolist(),
                 "radius": self.radius,
                 "noise": self.noise,
                 "speed": self.speed,

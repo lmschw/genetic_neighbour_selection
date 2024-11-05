@@ -14,7 +14,7 @@ def get_number_of_particles_for_constant_density(density, domain_size):
 
     Parameters:
         - density (float): the desired constant density of the domain
-        - domainSize (tuple): tuple containing the x and y dimensions of the domain size
+        - domain_size (tuple): tuple containing the x and y dimensions of the domain size
 
     Returns:
         The number of particles to be placed in the domain that corresponds to the density.
@@ -27,7 +27,7 @@ def get_density(domain_size, number_of_particles):
     Density formula: "density" = "number of particles" / "domain area"
 
     Parameters:
-        - domainSize (tuple): tuple containing the x and y dimensions of the domain size
+        - domain_size (tuple): tuple containing the x and y dimensions of the domain size
         - numberOfParticles (int): the number of particles to be placed in the domain
 
     Returns:
