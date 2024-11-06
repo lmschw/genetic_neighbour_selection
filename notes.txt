@@ -1,0 +1,10 @@
+- implement fitness function plot
+- store best for each generation separately
+- make values close to 0 = 0. (lowest 5% or 10%)
+- try with 5 agents
+- try random vectors to see if they produce order
+
+eval:
+- pca
+- hierarchical clustering
+- 
