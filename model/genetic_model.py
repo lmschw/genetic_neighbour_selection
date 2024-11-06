@@ -12,9 +12,11 @@ import services.service_helper as shelp
 
 class GeneticModel:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
-                 num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, start_timestep_evaluation=0, 
-                 changeover_point_timestep=0, start_order=None, target_order=1, population_size=100, bounds=[-1, 1], update_to_zero_bounds=[0,0],
-                 mutation_scale_factor=1, crossover_rate=0.5, early_stopping_after_gens=None):
+                 num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, 
+                 use_norm=True, c_values_norm_factor=0,
+                 start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, target_order=1, population_size=100, 
+                 bounds=[-1, 1], update_to_zero_bounds=[0,0], mutation_scale_factor=1, crossover_rate=0.5, 
+                 early_stopping_after_gens=None):
         """
         Models the DE approach.
 
@@ -48,6 +50,8 @@ class GeneticModel:
         self.tmax = tmax
         self.add_own_orientation = add_own_orientation
         self.add_random = add_random
+        self.use_norm = use_norm
+        self.c_values_norm_factor = c_values_norm_factor
         self.start_timestep_evaluation = start_timestep_evaluation
         self.changeover_point_timestep = changeover_point_timestep
         self.start_order = start_order
@@ -110,9 +114,13 @@ class GeneticModel:
         target = (self.changeover_point_timestep) * [self.start_order] + (self.tmax-self.changeover_point_timestep) * [self.target_order]
         resultsIntegral = integrate.simpson(y=resultsArr[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
         targetIntegral = integrate.simpson(y=target[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
+        
         if self.target_order == 1:
-            return (targetIntegral-resultsIntegral) / self.tmax
-        return resultsIntegral-targetIntegral / self.tmax
+            fitness = (targetIntegral-resultsIntegral) / self.tmax
+        else:
+            fitness = (resultsIntegral-targetIntegral) / self.tmax
+
+        return fitness + (self.c_values_norm_factor * np.linalg.norm(c_values))
     
     def __mutation(self, x, F):
         return x[0] + F * (x[1] - x[2])
@@ -130,7 +138,8 @@ class GeneticModel:
     
     def __update_c_values(self, c_values):
         c_values = np.where(((c_values >= self.update_to_zero_bounds[0]) & (c_values <= self.update_to_zero_bounds[1])), 0, c_values)
-        c_values = shelp.normalise(c_values)
+        if self.use_norm == True:
+            c_values = shelp.normalise(c_values)
         return c_values
     
     def __plot_fitnesses(self, fitnesses, save_path_plots=None):
