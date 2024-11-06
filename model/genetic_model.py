@@ -13,7 +13,7 @@ import services.service_helper as shelp
 class GeneticModel:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
                  num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, start_timestep_evaluation=0, 
-                 changeover_point_timestep=0, start_order=None, target_order=1, population_size=100, bounds=[-1, 1], 
+                 changeover_point_timestep=0, start_order=None, target_order=1, population_size=100, bounds=[-1, 1], update_to_zero_bounds=[0,0],
                  mutation_scale_factor=1, crossover_rate=0.5, early_stopping_after_gens=None):
         """
         Models the DE approach.
@@ -54,6 +54,7 @@ class GeneticModel:
         self.target_order = target_order
         self.population_size = population_size
         self.bounds = bounds
+        self.update_to_zero_bounds = update_to_zero_bounds
         self.mutation_scale_factor = mutation_scale_factor
         self.crossover_rate = crossover_rate
         self.early_stopping_after_gens = early_stopping_after_gens
@@ -93,12 +94,13 @@ class GeneticModel:
                 initialState = sprep.create_ordered_initial_distribution_equidistanced_individual(domain_size=self.domain_size, number_particles=self.number_particles)
             else:
                 initialState = (None, None, None)
+            c_values = self.__update_c_values(c_values)
             simulator = RunModel(domain_size=self.domain_size,
                                 radius=self.radius,
                                 noise=self.noise,
                                 speed=self.speed,
                                 number_particles=self.number_particles,
-                                c_values=shelp.normalise(c_values),
+                                c_values=c_values,
                                 add_own_orientation=self.add_own_orientation,
                                 add_random=self.add_random)
             simulation_data = simulator.simulate(tmax=self.tmax, initialState=initialState)
@@ -125,6 +127,11 @@ class GeneticModel:
         # generate trial vector by binomial crossover
         trial = [mutated[i] if p[i] < cr else target[i] for i in range(self.c_value_size)]
         return np.array(trial)
+    
+    def __update_c_values(self, c_values):
+        c_values = np.where(((c_values >= self.update_to_zero_bounds[0]) & (c_values <= self.update_to_zero_bounds[1])), 0, c_values)
+        c_values = shelp.normalise(c_values)
+        return c_values
     
     def __plot_fitnesses(self, fitnesses, save_path_plots=None):
         plt.plot(fitnesses)
