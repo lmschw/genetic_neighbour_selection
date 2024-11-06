@@ -111,8 +111,8 @@ class GeneticModel:
         resultsIntegral = integrate.simpson(y=resultsArr[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
         targetIntegral = integrate.simpson(y=target[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
         if self.target_order == 1:
-            return targetIntegral-resultsIntegral
-        return resultsIntegral-targetIntegral
+            return (targetIntegral-resultsIntegral) / self.tmax
+        return resultsIntegral-targetIntegral / self.tmax
     
     def __mutation(self, x, F):
         return x[0] + F * (x[1] - x[2])
