@@ -51,7 +51,7 @@ for i in range(1):
                         noise_percentage=0,
                         add_own_orientation=add_own,
                         add_random=add_random, 
-                        num_generations=5, 
+                        num_generations=20, 
                         num_iterations_per_individual=10,
                         population_size=20,
                         early_stopping_after_gens=None,
