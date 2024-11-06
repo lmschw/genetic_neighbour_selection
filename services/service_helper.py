@@ -4,7 +4,7 @@ from sklearn import preprocessing
 Contains helper methods that do not fit the themes of the other services.
 """
 
-def normalise(values):
+def normalise(values, norm='l2'):
     """
     Applies the Euclidean norm to the values.
 
@@ -14,5 +14,5 @@ def normalise(values):
     Returns:
         A numpy array with the normalised values.
     """
-    normalised_vector = preprocessing.normalize(X=[values], norm='l2')[0]
+    normalised_vector = preprocessing.normalize(X=[values], norm=norm)[0]
     return normalised_vector
