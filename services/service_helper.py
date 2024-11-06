@@ -15,4 +15,4 @@ def normalise(values):
         A numpy array with the normalised values.
     """
     normalised_vector = preprocessing.normalize(X=[values], norm='l2')[0]
-    return values/normalised_vector
+    return normalised_vector
