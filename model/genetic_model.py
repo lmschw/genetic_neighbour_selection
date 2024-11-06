@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.integrate as integrate
 import csv
+import matplotlib.pyplot as plt
 
 from model.run_model import RunModel
 import services.service_preparation as sprep
@@ -124,9 +125,16 @@ class GeneticModel:
         # generate trial vector by binomial crossover
         trial = [mutated[i] if p[i] < cr else target[i] for i in range(self.c_value_size)]
         return np.array(trial)
+    
+    def __plot_fitnesses(self, fitnesses, save_path_plots=None):
+        plt.plot(fitnesses)
+        if save_path_plots:
+            plt.savefig(f"{save_path_plots}.svg")
+        else:
+            plt.show()         
 
-    def run(self, save_path=None, log_depth='all'):
-        with open(f"{save_path}.csv", 'a', newline='') as log:
+    def run(self, save_path_plots=None, save_path_log=None, log_depth='all'):
+        with open(f"{save_path_log}.csv", 'a', newline='') as log:
             w = csv.writer(log)
             headers = slog.create_headers(self.c_value_size)
             w.writerow(headers)
@@ -136,6 +144,7 @@ class GeneticModel:
             best_individual = population[np.argmin(fitnesses)]
             best_fitness = min(fitnesses)
             prev_fitness = best_fitness
+            best_fitnesses_for_generations = [best_fitness]
             # saving the fitnesses
             if log_depth == 'all':
                 log_dict_list = slog.create_dicts_for_logging(-1, population, fitnesses)
@@ -172,7 +181,10 @@ class GeneticModel:
                 for dict in log_dict_list:
                     w.writerow(dict.values())
                 log.flush()
+                best_fitnesses_for_generations.append(best_fitness)
                 if self.early_stopping_after_gens != None and iter-last_improvement_at_gen > self.early_stopping_after_gens:
                     print(f"Early stopping at iteration {iter} after {self.early_stopping_after_gens} generations without improvement")
                     break
+
+            self.__plot_fitnesses(best_fitnesses_for_generations, save_path_plots)
             return [best_individual, best_fitness]
