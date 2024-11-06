@@ -104,7 +104,7 @@ class RunModel:
             orients = np.append(orients, orientations[:, np.newaxis, :], axis=1)
         if self.add_random == True:
             rands = np.random.uniform(low=-1, high=1, size=(self.number_particles, 2))
-            orients = np.append(orients, rands[:, np.newaxis, :])
+            orients = np.append(orients, rands[:, np.newaxis, :], axis=1)
         return orients
     
     def compute_new_orientations(self, positions, orientations):
