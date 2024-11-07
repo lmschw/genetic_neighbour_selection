@@ -146,6 +146,7 @@ class GeneticModel:
         plt.plot(fitnesses)
         if save_path_plots:
             plt.savefig(f"{save_path_plots}.svg")
+            plt.savefig(f"{save_path_plots}.jpeg")
         else:
             plt.show()         
 
