@@ -10,8 +10,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 
 
-location = "results/own_order_basic_n=10/"
-base_filepath = f"{location}best_own_order_basic_n=10_b5_normalised"
+location = "results/own_disorder_basic_n=10/"
+base_filepath = f"{location}best_own_disorder_basic_n=10_b5_normalised"
 
 df = pd.read_csv(f"{base_filepath}.csv")
 
@@ -25,15 +25,23 @@ data = df.drop(columns=['iter', 'fitness'])
 plt.plot(data)
 plt.savefig(f"{base_filepath}_full_line.jpeg")
 
+"""
 plt.figure(figsize = (10,7))
-idx_list = [27, 19, 5, 29, 44, 6, 41, 21, 35, 0, 15, 32]
-idx_list = [28, 29, 30, 31]
-idx_list = [40, 16, 49]
+idx_list = [1, 8, 48]
 example_data = data.iloc[idx_list]
 plt.plot(example_data.T)
 plt.legend(idx_list)
 plt.savefig(f"{base_filepath}_cluster_line_similar.jpeg")
 plt.show()
+
+plt.figure(figsize = (10,7))
+idx_list = [9, 10]
+example_data = data.iloc[idx_list]
+plt.plot(example_data.T)
+plt.legend(idx_list)
+plt.savefig(f"{base_filepath}_clusters.jpeg")
+plt.show()
+"""
 
 
 pca = PCA(n_components=2)
@@ -55,9 +63,10 @@ dend = sch.dendrogram(sch.linkage(df_pca, method='ward'))
 plt.savefig(f"{base_filepath}_dendrogram.svg")
 plt.savefig(f"{base_filepath}_dendrogram.jpeg")
 
-# model = AgglomerativeClustering(n_clusters = 2)
-# y_means = model.fit_predict(df_pca)     
-# plt.figure(figsize=(10, 8))
-# plt.title('Agglomerative Clustering with 4 Clusters')
-# plt.scatter(df_pca.P1, df_pca.P2, c=y_means, s=100)
-# plt.show()
+model = AgglomerativeClustering(n_clusters = 2)
+y_means = model.fit_predict(df_pca)     
+plt.figure(figsize=(10, 8))
+plt.title('Agglomerative Clustering with 2 Clusters')
+plt.scatter(df_pca.P1, df_pca.P2, c=y_means, s=100)
+plt.savefig(f"{base_filepath}_agglo_scatter.jpeg")
+plt.show()
