@@ -15,7 +15,10 @@ def normalize_orientations(orientations):
     Returns:
         The normalised orientations of all particles as an array.
     """
-    return orientations/(np.sqrt(np.sum(orientations**2,axis=1))[:,np.newaxis])
+    zero_mask = orientations==[0,0]
+    zero_masked = np.ma.MaskedArray(orientations, mask=zero_mask)
+    normalised = orientations/(np.sqrt(np.sum(zero_masked**2,axis=1))[:,np.newaxis])
+    return normalised.data
 
 def calculate_mean_orientations(orientations):
     """
