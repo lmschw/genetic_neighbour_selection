@@ -132,10 +132,7 @@ class GeneticModel:
         resultsIntegral = integrate.simpson(y=resultsArr[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
         targetIntegral = integrate.simpson(y=target[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
         
-        if self.target_order == 1:
-            fitness = (targetIntegral-resultsIntegral) / self.tmax
-        else:
-            fitness = (resultsIntegral-targetIntegral) / self.tmax
+        fitness = np.absolute(targetIntegral-resultsIntegral) / self.tmax
 
         return fitness + (self.c_values_norm_factor * np.linalg.norm(c_values)) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)
     
