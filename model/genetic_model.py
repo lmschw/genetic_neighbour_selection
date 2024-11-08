@@ -134,7 +134,7 @@ class GeneticModel:
         
         fitness = np.absolute(targetIntegral-resultsIntegral) / self.tmax
 
-        return fitness + (self.c_values_norm_factor * np.linalg.norm(c_values)) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)
+        return fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)
     
     def __mutation(self, x, F):
         return x[0] + F * (x[1] - x[2])
@@ -153,7 +153,7 @@ class GeneticModel:
     def __update_c_values(self, c_values):
         c_values = np.where(((c_values >= self.update_to_zero_bounds[0]) & (c_values <= self.update_to_zero_bounds[1])), 0, c_values)
         if self.use_norm == True:
-            c_values = shelp.normalise(c_values)
+            c_values = shelp.normalise(c_values, norm='l1')
         return c_values
     
     def __plot_fitnesses(self, fitnesses, save_path_plots=None):

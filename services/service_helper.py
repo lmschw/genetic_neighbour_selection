@@ -1,4 +1,5 @@
 from sklearn import preprocessing
+import numpy as np
 
 """
 Contains helper methods that do not fit the themes of the other services.
@@ -14,5 +15,8 @@ def normalise(values, norm='l1'):
     Returns:
         A numpy array with the normalised values.
     """
+    if norm == 'l0':
+        return np.count_nonzero(values)
+
     normalised_vector = preprocessing.normalize(X=[values], norm=norm)[0]
     return normalised_vector
