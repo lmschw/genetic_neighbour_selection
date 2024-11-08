@@ -13,7 +13,7 @@ import services.service_helper as shelp
 class GeneticModel:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
                  num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, 
-                 use_norm=True, c_values_norm_factor=0,
+                 use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi,
                  start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, target_order=1, population_size=100, 
                  bounds=[-1, 1], update_to_zero_bounds=[0,0], mutation_scale_factor=1, crossover_rate=0.5, 
                  early_stopping_after_gens=None):
@@ -52,6 +52,7 @@ class GeneticModel:
         self.add_random = add_random
         self.use_norm = use_norm
         self.c_values_norm_factor = c_values_norm_factor
+        self.orientations_difference_threshold = orientations_difference_threshold
         self.start_timestep_evaluation = start_timestep_evaluation
         self.changeover_point_timestep = changeover_point_timestep
         self.start_order = start_order
@@ -90,6 +91,22 @@ class GeneticModel:
 
     def __create_initial_population(self):
         return np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
+    
+    def __get_orientation_difference_threshold_contribution(self, orientations):
+        if self.orientations_difference_threshold == 2*np.pi:
+            return 0 # in this case, they are allowed to turn as much as they like
+        diff_gt_threshold = []
+        for t in range(1, len(orientations)):
+           orientations_t = sorient.compute_angles_for_orientations(orientations[t])
+           orientations_t_minus_1 = sorient.compute_angles_for_orientations(orientations[t-1]) 
+           diffs = np.absolute(orientations_t - orientations_t_minus_1)
+           mask = diffs < self.orientations_difference_threshold
+           masked_diffs = np.ma.MaskedArray(diffs, mask=mask, fill_value=0)
+           diff_gt_threshold.extend(masked_diffs.compressed())
+        percentage_flipflop = len(diff_gt_threshold)/(len(orientations)* len(orientations[0]))
+        if percentage_flipflop > 0.7:
+            return percentage_flipflop * 10
+        return 0
 
     def __fitness_function(self, c_values):
         results = {t: [] for t in range(self.tmax)}
@@ -120,7 +137,7 @@ class GeneticModel:
         else:
             fitness = (resultsIntegral-targetIntegral) / self.tmax
 
-        return fitness + (self.c_values_norm_factor * np.linalg.norm(c_values))
+        return fitness + (self.c_values_norm_factor * np.linalg.norm(c_values)) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)
     
     def __mutation(self, x, F):
         return x[0] + F * (x[1] - x[2])

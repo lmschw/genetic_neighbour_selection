@@ -71,3 +71,15 @@ def compute_global_order(orientations):
     """
     sumOrientation = np.sum(orientations[np.newaxis,:,:],axis=1)
     return np.divide(np.sqrt(np.sum(sumOrientation**2,axis=1)), len(orientations))[0]
+
+def compute_angles_for_orientations(orientations):
+    """
+    Computes the angle in radians based on the (u,v)-coordinates of the current orientation.
+
+    Params:
+        - orientation (array of floats): the current orientation in (u,v)-coordinates
+
+    Returns:
+        A float representin the angle in radians.
+    """
+    return np.arctan2(orientations[:, 1], orientations[:, 0])
