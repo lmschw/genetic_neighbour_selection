@@ -6,8 +6,14 @@
 - add the f = fitness + a*norm(c_values) version and test for different values of a a
 - add sectors to verify movement/encourage exploration
 - limit orientation difference
+    - count occurrences of large orientation differences. if more than x percent of cases, add the percentage to the fitness (80% = 80)
+    - if too many large orientation diffrences, return 1000 for the fitness
+    - use NGA-II (NSGA-II?) to explore the pareto front
+- use L1 norm on the c_values-vector for the simulation and L0 norm on the c_values for eval (f(L1(c_values)) + aL0(c_values))
+    - possiblytry L0, L1 norm for the c-values minimization
+    - possibly try a*L0*L1 norm for the c_values minimization
+- try with events 
 
 eval:
 - pca
 - hierarchical clustering
-- 
