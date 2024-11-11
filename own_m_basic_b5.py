@@ -7,15 +7,14 @@ import services.service_logging as slog
 import services.service_helper as shelp
 
 n = 10
-target_order = 1
-population_size = 30
+target_order = 0.5
+population_size = 50
 num_gens = 20
 num_iters = 5
 
 add_own = True
 add_random = True
 bounds = [-5, 5]
-zero_bounds = [-0.5, 0.5]
 
 num_c_values = 3 * (n-1)
 if add_own:
@@ -23,8 +22,8 @@ if add_own:
 if add_random:
     num_c_values += 1
 
-for a in [0.01, 0.05, 0.1]:
-    postfix = f"_own_random_order_zeros_n={n}_b5_a={a}"
+for a in [0.05, 0.1, 0.2, 0]:
+    postfix = f"_own_random_middle_basic_n={n}_b5_a={a}"
 
     print(postfix)
 
@@ -49,7 +48,6 @@ for a in [0.01, 0.05, 0.1]:
                             num_iterations_per_individual=10,
                             population_size=population_size,
                             bounds=bounds,
-                            update_to_zero_bounds=zero_bounds,
                             early_stopping_after_gens=None,
                             target_order=target_order)
 
@@ -59,3 +57,5 @@ for a in [0.01, 0.05, 0.1]:
 
         slog.log_results_to_csv([{'iter': i, 'individual': np.array(best[0]), 'fitness': best[1]}], prepare=True, save_path=save_path_best)
         slog.log_results_to_csv([{'iter': i, 'individual': shelp.normalise(np.array(best[0])), 'fitness': best[1]}], prepare=True, save_path=save_path_best_normalised)
+
+

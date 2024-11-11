@@ -10,8 +10,9 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 
 
-location = "results/own_disorder_basic_n=10/"
-base_filepath = f"{location}best_own_disorder_basic_n=10_b5_normalised"
+#location = "results/own_order_basic_n=5/"
+#base_filepath = f"{location}best_own_order_basic_n=5_b5_normalised"
+base_filepath = "best_own_random_order_basic_n=10_b5_normalised"
 
 df = pd.read_csv(f"{base_filepath}.csv")
 
@@ -25,23 +26,22 @@ data = df.drop(columns=['iter', 'fitness'])
 plt.plot(data)
 plt.savefig(f"{base_filepath}_full_line.jpeg")
 
-"""
-plt.figure(figsize = (10,7))
-idx_list = [1, 8, 48]
-example_data = data.iloc[idx_list]
-plt.plot(example_data.T)
-plt.legend(idx_list)
-plt.savefig(f"{base_filepath}_cluster_line_similar.jpeg")
-plt.show()
 
 plt.figure(figsize = (10,7))
-idx_list = [9, 10]
+idx_list = [2, 4, 3, 0]
 example_data = data.iloc[idx_list]
 plt.plot(example_data.T)
 plt.legend(idx_list)
 plt.savefig(f"{base_filepath}_clusters.jpeg")
 plt.show()
-"""
+
+plt.figure(figsize = (10,7))
+idx_list = [11, 0, 1]
+example_data = data.iloc[idx_list]
+plt.plot(example_data.T)
+plt.legend(idx_list)
+plt.savefig(f"{base_filepath}_cluster_line_similar.jpeg")
+plt.show()
 
 
 pca = PCA(n_components=2)

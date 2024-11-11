@@ -13,7 +13,7 @@ import services.service_helper as shelp
 class GeneticModel:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
                  num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, 
-                 use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi,
+                 use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi, zero_choice_probability=None,
                  start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, target_order=1, population_size=100, 
                  bounds=[-1, 1], update_to_zero_bounds=[0,0], mutation_scale_factor=1, crossover_rate=0.5, 
                  early_stopping_after_gens=None):
@@ -53,6 +53,7 @@ class GeneticModel:
         self.use_norm = use_norm
         self.c_values_norm_factor = c_values_norm_factor
         self.orientations_difference_threshold = orientations_difference_threshold
+        self.zero_choice_probability = zero_choice_probability
         self.start_timestep_evaluation = start_timestep_evaluation
         self.changeover_point_timestep = changeover_point_timestep
         self.start_order = start_order
@@ -90,7 +91,10 @@ class GeneticModel:
         print(f"dom={self.domain_size}, d={self.density}, n={self.number_particles}")
 
     def __create_initial_population(self):
-        return np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
+        rand_pop = np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
+        if self.zero_choice_probability != None:
+            rand_pop[np.random.rand(*rand_pop.shape) < self.zero_choice_probability] = 0
+        return rand_pop
     
     def __get_orientation_difference_threshold_contribution(self, orientations):
         if self.orientations_difference_threshold == 2*np.pi:
