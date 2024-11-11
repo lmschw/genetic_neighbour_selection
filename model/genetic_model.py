@@ -110,12 +110,12 @@ class GeneticModel:
 
     def __fitness_function(self, c_values):
         results = {t: [] for t in range(self.tmax)}
+        c_values = self.__update_c_values(c_values)
         for i in range(self.num_iterations_per_individual):
             if self.start_order == 1 or (self.start_order == None and i < (self.num_iterations_per_individual/2)):
                 initialState = sprep.create_ordered_initial_distribution_equidistanced_individual(domain_size=self.domain_size, number_particles=self.number_particles)
             else:
                 initialState = (None, None, None)
-            c_values = self.__update_c_values(c_values)
             simulator = RunModel(domain_size=self.domain_size,
                                 radius=self.radius,
                                 noise=self.noise,
