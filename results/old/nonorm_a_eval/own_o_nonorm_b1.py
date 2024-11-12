@@ -1,7 +1,7 @@
 import numpy as np
 
 from model.run_model import RunModel
-from model.genetic_model import GeneticModel
+from model.differential_evolution_model import DifferentialEvolution
 import services.service_preparation as sprep
 import services.service_logging as slog
 import services.service_helper as shelp
@@ -34,7 +34,7 @@ for factor in [0]:
     slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True), save_path=save_path_best_normalised)
 
     for i in range(3):
-        model = GeneticModel(radius=100, 
+        model = DifferentialEvolution(radius=100, 
                             tmax=1000, 
                             density=0.01, 
                             number_particles=n,

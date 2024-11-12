@@ -10,7 +10,7 @@ import services.service_logging as slog
 import services.service_helper as shelp
 
 
-class GeneticModel:
+class DifferentialEvolution:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
                  num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, 
                  use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi, zero_choice_probability=None,
