@@ -15,11 +15,11 @@ class GeneticAlgorithm:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
                  num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, 
                  use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi, zero_choice_probability_initial=None,
-                 zero_choice_probability_mutation=None, start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, 
+                 zero_choice_probability_mutation=0, start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, 
                  target_order=1, population_size=100, bounds=[-1, 1], update_to_zero_bounds=[0,0], mutation_scale_factor=1, 
-                 crossover_rate=0.5, early_stopping_after_gens=None, elite_size=2, sigma=0.1):
+                 crossover_rate=0.5, early_stopping_after_gens=None, elite_size=2, sigma=0.1, introduce_new_values_probability=0):
         """
-        Models the DE approach.
+        Models the GA approach.
 
         Params:
             - radius (int): the perception radius of the particles
@@ -68,6 +68,7 @@ class GeneticAlgorithm:
         self.early_stopping_after_gens = early_stopping_after_gens
         self.elite_size = elite_size
         self.sigma = sigma
+        self.introduce_new_values_probability = introduce_new_values_probability
 
         if any(ele is None for ele in domain_size) and (density == None or number_particles == None):
             raise Exception("If you do not suppy a domain_size, you need to provide both the density and the number of particles.")
@@ -149,8 +150,14 @@ class GeneticAlgorithm:
     def __mutation(self, x):
         noise = np.random.normal(0, self.sigma, x.shape) 
         mutated_with_noise = x + noise
-        if self.zero_choice_probability_mutation != None:
-            mutated_with_noise[np.random.rand(*mutated_with_noise.shape) < self.zero_choice_probability_mutation] = 0
+
+        rands = np.random.uniform(0, 1, size=x.shape)
+        prob_noise = 1-self.introduce_new_values_probability-self.introduce_new_values_probability
+        if self.introduce_new_values_probability > 0:
+            new_vals = np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=x.shape)
+            mutated_with_noise = np.where(((rands > prob_noise) & (rands <= (1-self.zero_choice_probability_mutation))), new_vals, mutated_with_noise)
+        if self.zero_choice_probability_mutation > 0:
+            mutated_with_noise = np.where((rands > (1-self.zero_choice_probability_mutation)), 0, mutated_with_noise)        
         return mutated_with_noise
     
     def __check_bounds(self, mutated, bounds):
