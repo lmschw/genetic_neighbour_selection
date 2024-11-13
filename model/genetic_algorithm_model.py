@@ -3,7 +3,6 @@ import random
 import scipy.integrate as integrate
 import csv
 import matplotlib.pyplot as plt
-from prettytable import PrettyTable
 
 from model.run_model import RunModel
 import services.service_preparation as sprep
@@ -15,10 +14,10 @@ import services.service_helper as shelp
 class GeneticAlgorithm:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
                  num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, 
-                 use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi, zero_choice_probability=None,
-                 start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, target_order=1, population_size=100, 
-                 bounds=[-1, 1], update_to_zero_bounds=[0,0], mutation_scale_factor=1, crossover_rate=0.5, 
-                 early_stopping_after_gens=None, elite_size=2):
+                 use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi, zero_choice_probability_initial=None,
+                 zero_choice_probability_mutation=None, start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, 
+                 target_order=1, population_size=100, bounds=[-1, 1], update_to_zero_bounds=[0,0], mutation_scale_factor=1, 
+                 crossover_rate=0.5, early_stopping_after_gens=None, elite_size=2, sigma=0.1):
         """
         Models the DE approach.
 
@@ -55,7 +54,8 @@ class GeneticAlgorithm:
         self.use_norm = use_norm
         self.c_values_norm_factor = c_values_norm_factor
         self.orientations_difference_threshold = orientations_difference_threshold
-        self.zero_choice_probability = zero_choice_probability
+        self.zero_choice_probability_initial = zero_choice_probability_initial
+        self.zero_choice_probability_mutation = zero_choice_probability_mutation
         self.start_timestep_evaluation = start_timestep_evaluation
         self.changeover_point_timestep = changeover_point_timestep
         self.start_order = start_order
@@ -67,6 +67,7 @@ class GeneticAlgorithm:
         self.crossover_rate = crossover_rate
         self.early_stopping_after_gens = early_stopping_after_gens
         self.elite_size = elite_size
+        self.sigma = sigma
 
         if any(ele is None for ele in domain_size) and (density == None or number_particles == None):
             raise Exception("If you do not suppy a domain_size, you need to provide both the density and the number of particles.")
@@ -97,8 +98,8 @@ class GeneticAlgorithm:
 
     def __create_initial_population(self):
         rand_pop = np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
-        if self.zero_choice_probability != None:
-            rand_pop[np.random.rand(*rand_pop.shape) < self.zero_choice_probability] = 0
+        if self.zero_choice_probability_initial != None:
+            rand_pop[np.random.rand(*rand_pop.shape) < self.zero_choice_probability_initial] = 0
         return rand_pop
     
     def __get_orientation_difference_threshold_contribution(self, orientations):
@@ -143,22 +144,25 @@ class GeneticAlgorithm:
         
         fitness = np.absolute(targetIntegral-resultsIntegral) / self.tmax
 
-        return fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)        
-
+        return fitness, fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)        
 
     def __mutation(self, x):
-        # TODO: add Gaussian noise to all values
-        # TODO: replace values with zero with a certain likelihood
-        return x
+        noise = np.random.normal(0, self.sigma, x.shape) 
+        mutated_with_noise = x + noise
+        if self.zero_choice_probability_mutation != None:
+            mutated_with_noise[np.random.rand(*mutated_with_noise.shape) < self.zero_choice_probability_mutation] = 0
+        return mutated_with_noise
     
     def __check_bounds(self, mutated, bounds):
         mutated_bound = np.clip(mutated, bounds[0], bounds[1])
         return mutated_bound
     
-    def __crossover(self, parent1, parent2):
-        alpha = random.random()
-        child = tuple(alpha * p1 + (1 - alpha) * p2 for p1, p2 in zip(parent1, parent2))
-        return child[0][np.newaxis, :]
+    def __crossover(self, p1, p2):
+        pt = random.randint(1, len(p1)-2)
+        a = list(p1[:pt])
+        b = list(p2[pt:])
+        a.extend(b)
+        return np.array(a)
     
     def __update_c_values(self, c_values):
         c_values = np.where(((c_values >= self.update_to_zero_bounds[0]) & (c_values <= self.update_to_zero_bounds[1])), 0, c_values)
@@ -185,29 +189,20 @@ class GeneticAlgorithm:
 
             population  = self.__create_initial_population()
 
-            table = PrettyTable()
-            table.field_names = ["Generation"]
-            for i in range(self.c_value_size):
-                table.field_names.append(f"c{i}")
-            table.field_names.append("Fitness")
-
             last_improvement_at_gen = 0
             best_fitnesses_for_generations = []
             prev_fitness = None
             for generation in range(self.num_generations):
                 print(f"gen {generation+1}/{self.num_generations}")
-                fitnesses = np.array([self.__fitness_function(individual) for individual in population])
+                fitnesses_both = np.array([self.__fitness_function(individual) for individual in population])
+
+                fitnesses_order = fitnesses_both[:, 0]
+                fitnesses = fitnesses_both[:, 1]
 
                 sorted_indices = np.argsort(fitnesses)
                 best_individual_index = sorted_indices[0]
                 best_individual = population[best_individual_index]
-                best_fitness = fitnesses[best_individual_index]
-
-                tablerow = [generation + 1]
-                for i in range(self.c_value_size):
-                    tablerow.append(best_individual[i])
-                tablerow.append(best_fitness)
-                table.add_row(tablerow)        
+                best_fitness = fitnesses[best_individual_index] 
 
                 if prev_fitness == None or best_fitness < prev_fitness:
                     best_individual = population[np.argmin(fitnesses)]
@@ -215,29 +210,32 @@ class GeneticAlgorithm:
                     last_improvement_at_gen = generation
                     print('Iteration: %d f([%s]) = %.5f' % (generation, np.around(best_individual, decimals=5), best_fitness))
 
-                new_population = list(fitnesses[sorted_indices[:self.elite_size]])
-                for j in range(self.population_size-self.elite_size):
-                    p1 = rng.choice(a=population, size=1, p=self.selection_probabilities, axis=0)
-                    # TODO prohibit choosing the same parent twice
-                    p2 = rng.choice(a=population, size=1, axis=0)
-                    child = self.__crossover(parent1=p1, parent2=p2)
-                    #child = self.__mutation(child)
-                    new_population.append(child)
-
-                population = new_population
-
-                # saving the fitnesses
+                                # saving the fitnesses
                 if log_depth == 'all':
-                    log_dict_list = slog.create_dicts_for_logging(generation, population, fitnesses)
+                    log_dict_list = slog.create_dicts_for_logging(generation, population, fitnesses, fitnesses_order)
                 else:
-                    log_dict_list = slog.create_dicts_for_logging(generation, [best_individual], [best_fitness])
+                    log_dict_list = slog.create_dicts_for_logging(generation, [best_individual], [best_fitness], [fitnesses_order[best_individual_index]])
                 for dict in log_dict_list:
                     w.writerow(dict.values())
                 log.flush()
+
                 best_fitnesses_for_generations.append(best_fitness)
                 if self.early_stopping_after_gens != None and generation-last_improvement_at_gen > self.early_stopping_after_gens:
                     print(f"Early stopping at iteration {generation} after {self.early_stopping_after_gens} generations without improvement")
                     break
 
+                # Creating the new population
+                new_population = list(population[sorted_indices[:self.elite_size]])
+                p1 = rng.choice(a=population, size=(self.population_size-self.elite_size), p=self.selection_probabilities, axis=0)
+                # TODO prohibit choosing the same parent twice
+                p2 = rng.choice(a=population, size=(self.population_size-self.elite_size), axis=0)
+                for j in range(len(p1)):
+                    child = self.__crossover(p1=p1[j], p2=p2[j])
+                    child = self.__mutation(child)
+                    child = self.__check_bounds(child, bounds=self.bounds)
+                    new_population.append(child)
+
+                population = np.array(new_population)
+
             self.__plot_fitnesses(best_fitnesses_for_generations, save_path_plots)
-            return [best_individual, best_fitness]
+            return [best_individual, best_fitness, fitnesses_order[best_individual_index]]
