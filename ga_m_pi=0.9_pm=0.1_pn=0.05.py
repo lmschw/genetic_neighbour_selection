@@ -12,9 +12,9 @@ prob_init = 0.9
 prob_mut = 0.1
 prob_intro = 0.05
 target_order = 0.5
-population_size = 10
-num_gens = 5
-num_iters = 5
+population_size = 30
+num_gens = 20
+num_iters = 50
 num_iters_per_ind = 10
 early_stopping = None
 
