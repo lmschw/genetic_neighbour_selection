@@ -14,6 +14,12 @@
     - possibly try a*L0*L1 norm for the c_values minimization
 - try with events 
 
+13.11.:
+- use L1 norm instead of L0 to minimise magnitude of the c-values
+- set cs to 0 if the value is smaller than 1% of the domain (1% of 10 = 0.1)
+- mutate value based on random value (90% prob for noise, 5% prob for setting to 0, 5% prob for setting to a random new value within the bounds)
+- start with very sparse vectors (only 5% or 10% with values)
+
 eval:
 - pca
 - hierarchical clustering
