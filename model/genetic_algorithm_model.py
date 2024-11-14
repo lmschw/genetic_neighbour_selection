@@ -17,7 +17,8 @@ class GeneticAlgorithm:
                  use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi, zero_choice_probability_initial=None,
                  zero_choice_probability_mutation=0, start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, 
                  target_order=1, population_size=100, bounds=[-1, 1], update_to_zero_bounds=[0,0], mutation_scale_factor=1, 
-                 crossover_rate=0.5, early_stopping_after_gens=None, elite_size=2, sigma=0.1, introduce_new_values_probability=0):
+                 crossover_rate=0.5, early_stopping_after_gens=None, elite_size=2, sigma=0.1, introduce_new_values_probability=0,
+                 events=None):
         """
         Models the GA approach.
 
@@ -69,6 +70,7 @@ class GeneticAlgorithm:
         self.elite_size = elite_size
         self.sigma = sigma
         self.introduce_new_values_probability = introduce_new_values_probability
+        self.events = events
 
         if any(ele is None for ele in domain_size) and (density == None or number_particles == None):
             raise Exception("If you do not suppy a domain_size, you need to provide both the density and the number of particles.")
@@ -134,17 +136,26 @@ class GeneticAlgorithm:
                                 number_particles=self.number_particles,
                                 c_values=c_values,
                                 add_own_orientation=self.add_own_orientation,
-                                add_random=self.add_random)
+                                add_random=self.add_random,
+                                events=self.events)
             simulation_data = simulator.simulate(tmax=self.tmax, initialState=initialState)
             _, _, orientations = simulation_data
             [results[t].append(sorient.compute_global_order(orientations[t])) for t in range(self.tmax)]
         resultsArr = [np.average(results[t]) for t in range(self.tmax)]
         target = (self.changeover_point_timestep) * [self.start_order] + (self.tmax-self.changeover_point_timestep) * [self.target_order]
-        resultsIntegral = integrate.simpson(y=resultsArr[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
-        targetIntegral = integrate.simpson(y=target[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
         
-        fitness = np.absolute(targetIntegral-resultsIntegral) / self.tmax
+        if self.changeover_point_timestep == 0:
+            results_integral = integrate.simpson(y=resultsArr[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
+            target_integral = integrate.simpson(y=target[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
+            
+            fitness = np.absolute(target_integral-results_integral) / self.tmax
+        else:
+            part1_results_integral = integrate.simpson(y=resultsArr[self.start_timestep_evaluation: self.changeover_point_timestep], x=range(self.start_timestep_evaluation, self.changeover_point_timestep))
+            part2_results_integral = integrate.simpson(y=resultsArr[self.changeover_point_timestep: self.tmax], x=range(self.changeover_point_timestep, self.tmax))
+            part1_target_integral = integrate.simpson(y=target[self.start_timestep_evaluation: self.changeover_point_timestep], x=range(self.start_timestep_evaluation, self.changeover_point_timestep))
+            part2_target_integral = integrate.simpson(y=target[self.changeover_point_timestep: self.tmax], x=range(self.changeover_point_timestep, self.tmax))
 
+            fitness = (np.absolute(part1_target_integral-part1_results_integral) + np.absolute(part2_target_integral-part2_results_integral)) / self.tmax
         return fitness, fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)        
 
     def __mutation(self, x):

@@ -83,3 +83,36 @@ def compute_angles_for_orientations(orientations):
         A float representin the angle in radians.
     """
     return np.arctan2(orientations[:, 1], orientations[:, 0])
+
+
+def compute_uv_coordinates(angle):
+    """
+    Computes the (u,v)-coordinates based on the angle.
+
+    Params:
+        - angle (float): the angle in radians
+
+    Returns:
+        An array containing the [u, v]-coordinates corresponding to the angle.
+    """
+    # compute the uv-coordinates
+    U = np.cos(angle)
+    V = np.sin(angle)
+    
+    return [U,V]
+
+def compute_uv_coordinates_for_list(angles):
+    """
+    Computes the (u,v)-coordinates based on the angle.
+
+    Params:
+        - angle (float): the angle in radians
+
+    Returns:
+        An array containing the [u, v]-coordinates corresponding to the angle.
+    """
+    # compute the uv-coordinates
+    U = np.cos(angles)
+    V = np.sin(angles)
+    
+    return np.column_stack((U,V))

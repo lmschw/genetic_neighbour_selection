@@ -7,7 +7,8 @@ class RunModel:
     """
     Performs the actual simulation of the agents interacting in the domain.
     """
-    def __init__(self, domain_size, radius, noise, speed, number_particles, c_values, add_own_orientation=False, add_random=False):
+    def __init__(self, domain_size, radius, noise, speed, number_particles, c_values, 
+                 add_own_orientation=False, add_random=False, events=None):
         """
         Params:
             - domain_size (tuple of floats) [optional]: the dimensions of the domain
@@ -27,6 +28,7 @@ class RunModel:
         self.c_values = c_values
         self.add_own_orientation = add_own_orientation
         self.add_random = add_random
+        self.events = events
 
     def get_parameter_summary(self):
         return {"domain_size": self.domain_size.tolist(),
@@ -202,6 +204,10 @@ class RunModel:
             self.t = t
             # if t % 5000 == 0:
             #     print(f"t={t}/{self.tmax}")
+
+            if self.events != None:
+                for event in self.events:
+                    orientations = event.check(self.number_particles, t, positions, orientations)
 
             orientations = self.compute_new_orientations(positions, orientations)
             orientations = sorient.normalize_orientations(orientations+self.generate_noise())
