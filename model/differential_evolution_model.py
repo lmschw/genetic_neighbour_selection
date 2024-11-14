@@ -133,10 +133,10 @@ class DifferentialEvolution:
             [results[t].append(sorient.compute_global_order(orientations[t])) for t in range(self.tmax)]
         resultsArr = [np.average(results[t]) for t in range(self.tmax)]
         target = (self.changeover_point_timestep) * [self.start_order] + (self.tmax-self.changeover_point_timestep) * [self.target_order]
-        resultsIntegral = integrate.simpson(y=resultsArr[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
-        targetIntegral = integrate.simpson(y=target[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
+        results_integral = integrate.simpson(y=resultsArr[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
+        target_integral = integrate.simpson(y=target[self.start_timestep_evaluation: self.tmax], x=range(self.start_timestep_evaluation, self.tmax))
         
-        fitness = np.absolute(targetIntegral-resultsIntegral) / self.tmax
+        fitness = np.absolute(target_integral-results_integral) / self.tmax
 
         return fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)
     
