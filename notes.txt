@@ -20,6 +20,13 @@
 - mutate value based on random value (90% prob for noise, 5% prob for setting to 0, 5% prob for setting to a random new value within the bounds)
 - start with very sparse vectors (only 5% or 10% with values)
 
+15.11:
+- add noise to existing model
+- set speed to 0.1 (needs longer runs)
+- try with the flipping prevention
+
+- also implement the active-elastic approach
+
 eval:
 - pca
 - hierarchical clustering
