@@ -12,7 +12,7 @@ prob_init = 0.9
 prob_mut = 0.1
 prob_intro = 0.05
 start_order = 0
-target_order = 1
+target_order = 0.5
 population_size = 30
 num_gens = 20
 num_iters = 50
@@ -28,6 +28,7 @@ radius = 100
 noise_percentage = 1
 speed = 0.1
 density = 0.01
+orientations_difference_threshold = 3 * np.pi / 4
 
 num_c_values = 3 * (n-1)
 if add_own:
@@ -36,11 +37,11 @@ if add_random:
     num_c_values += 1
 
 if target_order == 1:
-    postfix = f"_test_ga_order_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_order_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_th={orientations_difference_threshold}"
 elif target_order == 0:
-    postfix = f"_test_ga_disorder_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_disorder_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_th={orientations_difference_threshold}"
 else:
-    postfix = f"_test_ga_middle_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_middle_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_th={orientations_difference_threshold}"
 
 print(postfix)
 
@@ -62,6 +63,7 @@ for i in range(num_iters):
                         speed=speed,
                         add_own_orientation=add_own,
                         add_random=add_random, 
+                        orientations_difference_threshold=orientations_difference_threshold,
                         c_values_norm_factor=alpha,
                         zero_choice_probability_initial=prob_init,
                         zero_choice_probability_mutation=prob_mut,
