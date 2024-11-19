@@ -199,7 +199,7 @@ class GeneticAlgorithm:
     def run(self, save_path_plots=None, save_path_log=None, log_depth='all'):
         with open(f"{save_path_log}.csv", 'a', newline='') as log:
             w = csv.writer(log)
-            headers = slog.create_headers(self.c_value_size)
+            headers = slog.create_headers(self.c_value_size, n=self.number_particles, has_own=self.add_own_orientation, has_random=self.add_random)
             w.writerow(headers)
             log.flush()
 
@@ -230,9 +230,9 @@ class GeneticAlgorithm:
 
                                 # saving the fitnesses
                 if log_depth == 'all':
-                    log_dict_list = slog.create_dicts_for_logging(generation, population, fitnesses, fitnesses_order)
+                    log_dict_list = slog.create_dicts_for_logging(iter=generation, individuals=population, fitnesses=fitnesses, fitnesses_order=fitnesses_order, n=self.number_particles)
                 else:
-                    log_dict_list = slog.create_dicts_for_logging(generation, [best_individual], [best_fitness], [fitnesses_order[best_individual_index]])
+                    log_dict_list = slog.create_dicts_for_logging(iter=generation, individuals=[best_individual], fitnesses=[best_fitness], fitnesses_order=[fitnesses_order[best_individual_index]], n=self.number_particles)
                 for dict in log_dict_list:
                     w.writerow(dict.values())
                 log.flush()
