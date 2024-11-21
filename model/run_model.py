@@ -89,6 +89,7 @@ class RunModel:
         diagonal_mask = np.full((self.number_particles, self.number_particles), False)
         np.fill_diagonal(diagonal_mask, True)
 
+        orients = []
         if self.rank_by_orientation == True:
             orientation_differences = np.ma.MaskedArray(sorient.get_differences(orientations, self.domain_size), mask=diagonal_mask)
             orientation_diff_sorted_indices = np.argsort(orientation_differences, axis=1)
@@ -101,20 +102,20 @@ class RunModel:
             distances_sorted_indices = np.argsort(distances, axis=1)
             distances_sorted_indices_without_diagonal = distances_sorted_indices[:, :-1]
             orientations_by_distance = np.array(orientations[distances_sorted_indices_without_diagonal])
-            if orients:
-                orients = np.append(orients, orientations_by_distance, axis=1)
-            else:
+            if len(orients) == 0:
                 orients = orientations_by_distance
+            else:
+                orients = np.append(orients, orientations_by_distance, axis=1)
 
         if self.rank_by_bearing == True:
             bearings = np.ma.MaskedArray(self.compute_bearings(positions=positions), mask=diagonal_mask)
             bearings_sorted_indices = np.argsort(bearings, axis=1)
             bearings_sorted_indices_without_diagonal = bearings_sorted_indices[:, :-1]
             orientations_by_bearing = np.array(orientations[bearings_sorted_indices_without_diagonal])
-            if orients:
-                orients = np.append(orients, orientations_by_bearing, axis=1)
-            else:
+            if len(orients) == 0:
                 orients = orientations_by_bearing
+            else:
+                orients = np.append(orients, orientations_by_bearing, axis=1)
                 
         if self.add_own_orientation == True:
             orients = np.append(orients, orientations[:, np.newaxis, :], axis=1)
