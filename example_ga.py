@@ -18,8 +18,9 @@ num_iters = 5
 num_iters_per_ind = 1
 early_stopping = None
 
+add_ranking_by = [True, False, False]
 add_own = True
-add_random = True
+add_random = False
 bounds = [-5, 5]
 
 num_c_values = 3 * (n-1)
@@ -42,8 +43,8 @@ save_path_best_normalised = f"best{postfix}_normalised.csv"
 save_path_general = f"all{postfix}"
 save_path_plot = f"plot{postfix}"
 
-slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True, n=n, has_own=add_own, has_random=add_random), save_path=save_path_best)
-slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True, n=n, has_own=add_own, has_random=add_random), save_path=save_path_best_normalised)
+slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True, n=n, has_own=add_own, has_random=add_random, ranking_by=add_ranking_by), save_path=save_path_best)
+slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True, n=n, has_own=add_own, has_random=add_random, ranking_by=add_ranking_by), save_path=save_path_best_normalised)
 
 for i in range(num_iters):
     model = GeneticAlgorithm(radius=100, 
@@ -51,6 +52,7 @@ for i in range(num_iters):
                         density=0.01, 
                         number_particles=n,
                         noise_percentage=0,
+                        add_ranking_by=add_ranking_by,
                         add_own_orientation=add_own,
                         add_random=add_random, 
                         c_values_norm_factor=alpha,
@@ -67,7 +69,7 @@ for i in range(num_iters):
     print(f"BEST overall: {best}")
 
 
-    slog.log_results_to_csv([{'iter': i, 'individual': np.array(best[0]), 'fitness': best[1], 'fitness_order': best[2]}], prepare=True, save_path=save_path_best, n=n)
-    slog.log_results_to_csv([{'iter': i, 'individual': shelp.normalise(np.array(best[0])), 'fitness': best[1], 'fitness_order': best[2]}], prepare=True, save_path=save_path_best_normalised, n=n)
+    slog.log_results_to_csv([{'iter': i, 'individual': np.array(best[0]), 'fitness': best[1], 'fitness_order': best[2]}], ranking_by=add_ranking_by, prepare=True, save_path=save_path_best, n=n)
+    slog.log_results_to_csv([{'iter': i, 'individual': shelp.normalise(np.array(best[0])), 'fitness': best[1], 'fitness_order': best[2]}], ranking_by=add_ranking_by, prepare=True, save_path=save_path_best_normalised, n=n)
 
 

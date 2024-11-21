@@ -8,7 +8,7 @@ class RunModel:
     Performs the actual simulation of the agents interacting in the domain.
     """
     def __init__(self, domain_size, radius, noise, speed, number_particles, c_values, 
-                 add_own_orientation=False, add_random=False, events=None):
+                 add_ranking_by=[True, True, True], add_own_orientation=False, add_random=False, events=None):
         """
         Params:
             - domain_size (tuple of floats) [optional]: the dimensions of the domain
@@ -26,6 +26,10 @@ class RunModel:
         self.speed = speed
         self.number_particles = number_particles
         self.c_values = c_values
+        self.add_ranking_by = add_ranking_by
+        self.rank_by_orientation = add_ranking_by[0]
+        self.rank_by_distance = add_ranking_by[1]
+        self.rank_by_bearing = add_ranking_by[2]
         self.add_own_orientation = add_own_orientation
         self.add_random = add_random
         self.events = events
@@ -37,6 +41,7 @@ class RunModel:
                 "speed": self.speed,
                 "number_particles": self.number_particles,
                 "c_values": self.c_values.tolist(),
+                "add_ranking_by": self.add_ranking_by,
                 "add_own_orientation": self.add_own_orientation,
                 "add_random": self.add_random}
         
@@ -83,25 +88,34 @@ class RunModel:
         # we remove the diagonal after the sorting to remove the particle's own information
         diagonal_mask = np.full((self.number_particles, self.number_particles), False)
         np.fill_diagonal(diagonal_mask, True)
-        
-        orientation_differences = np.ma.MaskedArray(sorient.get_differences(orientations, self.domain_size), mask=diagonal_mask)
-        orientation_diff_sorted_indices = np.argsort(orientation_differences, axis=1)
-        orientation_diff_sorted_indices_without_diagonal = orientation_diff_sorted_indices[:, :-1]
-        orientations_by_orientation_diff = np.array(orientations[orientation_diff_sorted_indices_without_diagonal])
 
-        distances = np.ma.MaskedArray(sorient.get_differences(positions, self.domain_size), mask=diagonal_mask)
-        distances_sorted_indices = np.argsort(distances, axis=1)
-        distances_sorted_indices_without_diagonal = distances_sorted_indices[:, :-1]
-        orientations_by_distance = np.array(orientations[distances_sorted_indices_without_diagonal])
+        if self.rank_by_orientation == True:
+            orientation_differences = np.ma.MaskedArray(sorient.get_differences(orientations, self.domain_size), mask=diagonal_mask)
+            orientation_diff_sorted_indices = np.argsort(orientation_differences, axis=1)
+            orientation_diff_sorted_indices_without_diagonal = orientation_diff_sorted_indices[:, :-1]
+            orientations_by_orientation_diff = np.array(orientations[orientation_diff_sorted_indices_without_diagonal])
+            orients = orientations_by_orientation_diff
 
-        bearings = np.ma.MaskedArray(self.compute_bearings(positions=positions), mask=diagonal_mask)
-        bearings_sorted_indices = np.argsort(bearings, axis=1)
-        bearings_sorted_indices_without_diagonal = bearings_sorted_indices[:, :-1]
-        orientations_by_bearing = np.array(orientations[bearings_sorted_indices_without_diagonal])
+        if self.rank_by_distance == True:
+            distances = np.ma.MaskedArray(sorient.get_differences(positions, self.domain_size), mask=diagonal_mask)
+            distances_sorted_indices = np.argsort(distances, axis=1)
+            distances_sorted_indices_without_diagonal = distances_sorted_indices[:, :-1]
+            orientations_by_distance = np.array(orientations[distances_sorted_indices_without_diagonal])
+            if orients:
+                orients = np.append(orients, orientations_by_distance, axis=1)
+            else:
+                orients = orientations_by_distance
 
-        orients = orientations_by_orientation_diff
-        orients = np.append(orients, orientations_by_distance, axis=1)
-        orients = np.append(orients, orientations_by_bearing, axis=1)
+        if self.rank_by_bearing == True:
+            bearings = np.ma.MaskedArray(self.compute_bearings(positions=positions), mask=diagonal_mask)
+            bearings_sorted_indices = np.argsort(bearings, axis=1)
+            bearings_sorted_indices_without_diagonal = bearings_sorted_indices[:, :-1]
+            orientations_by_bearing = np.array(orientations[bearings_sorted_indices_without_diagonal])
+            if orients:
+                orients = np.append(orients, orientations_by_bearing, axis=1)
+            else:
+                orients = orientations_by_bearing
+                
         if self.add_own_orientation == True:
             orients = np.append(orients, orientations[:, np.newaxis, :], axis=1)
         if self.add_random == True:

@@ -13,7 +13,7 @@ import services.service_helper as shelp
 
 class GeneticAlgorithm:
     def __init__(self, radius, tmax, domain_size=(None, None), density=None, number_particles=None, speed=1, noise_percentage=0, 
-                 num_generations=1000, num_iterations_per_individual=10, add_own_orientation=False, add_random=False, 
+                 num_generations=1000, num_iterations_per_individual=10, add_ranking_by=[True, True, True], add_own_orientation=False, add_random=False, 
                  use_norm=True, c_values_norm_factor=0, orientations_difference_threshold=2*np.pi, zero_choice_probability_initial=None,
                  zero_choice_probability_mutation=0, start_timestep_evaluation=0, changeover_point_timestep=0, start_order=None, 
                  target_order=1, population_size=100, bounds=[-1, 1], update_to_zero_bounds=[0,0], mutation_scale_factor=1, 
@@ -50,6 +50,7 @@ class GeneticAlgorithm:
         self.noise = sprep.get_noise_amplitude_value_for_percentage(self.noise_percentage)
 
         self.tmax = tmax
+        self.add_ranking_by = add_ranking_by
         self.add_own_orientation = add_own_orientation
         self.add_random = add_random
         self.use_norm = use_norm
@@ -89,7 +90,8 @@ class GeneticAlgorithm:
             self.number_particles = number_particles
             self.domain_size = sprep.get_domain_size_for_constant_density(self.density, self.number_particles)
 
-        self.c_value_size = (self.number_particles-1) * 3
+        num_rankings = np.count_nonzero(np.array(self.add_ranking_by))
+        self.c_value_size = (self.number_particles-1) * num_rankings
         if self.add_own_orientation:
             self.c_value_size += 1
         if self.add_random:
@@ -135,6 +137,7 @@ class GeneticAlgorithm:
                                 speed=self.speed,
                                 number_particles=self.number_particles,
                                 c_values=c_values,
+                                add_ranking_by=self.add_ranking_by,
                                 add_own_orientation=self.add_own_orientation,
                                 add_random=self.add_random,
                                 events=self.events)
@@ -199,7 +202,7 @@ class GeneticAlgorithm:
     def run(self, save_path_plots=None, save_path_log=None, log_depth='all'):
         with open(f"{save_path_log}.csv", 'a', newline='') as log:
             w = csv.writer(log)
-            headers = slog.create_headers(self.c_value_size, n=self.number_particles, has_own=self.add_own_orientation, has_random=self.add_random)
+            headers = slog.create_headers(self.c_value_size, n=self.number_particles, ranking_by=self.add_ranking_by, has_own=self.add_own_orientation, has_random=self.add_random)
             w.writerow(headers)
             log.flush()
 
@@ -230,9 +233,9 @@ class GeneticAlgorithm:
 
                                 # saving the fitnesses
                 if log_depth == 'all':
-                    log_dict_list = slog.create_dicts_for_logging(iter=generation, individuals=population, fitnesses=fitnesses, fitnesses_order=fitnesses_order, n=self.number_particles)
+                    log_dict_list = slog.create_dicts_for_logging(iter=generation, individuals=population, fitnesses=fitnesses, fitnesses_order=fitnesses_order, ranking_by=self.add_ranking_by, n=self.number_particles)
                 else:
-                    log_dict_list = slog.create_dicts_for_logging(iter=generation, individuals=[best_individual], fitnesses=[best_fitness], fitnesses_order=[fitnesses_order[best_individual_index]], n=self.number_particles)
+                    log_dict_list = slog.create_dicts_for_logging(iter=generation, individuals=[best_individual], fitnesses=[best_fitness], fitnesses_order=[fitnesses_order[best_individual_index]], ranking_by=self.add_ranking_by, n=self.number_particles)
                 for dict in log_dict_list:
                     w.writerow(dict.values())
                 log.flush()
