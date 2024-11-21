@@ -79,7 +79,8 @@ for i in range(num_iters):
     print(f"BEST overall: {best}")
 
 
-    slog.log_results_to_csv([{'iter': i, 'individual': np.array(best[0]), 'fitness': best[1], 'fitness_order': best[2]}], ranking_by=add_ranking_by, prepare=True, save_path=save_path_best)
-    slog.log_results_to_csv([{'iter': i, 'individual': shelp.normalise(np.array(best[0])), 'fitness': best[1], 'fitness_order': best[2]}], ranking_by=add_ranking_by, prepare=True, save_path=save_path_best_normalised)
+    slog.log_results_to_csv([{'iter': i, 'individual': np.array(best[0]), 'fitness': best[1], 'fitness_order': best[2]}], ranking_by=add_ranking_by, n=n, prepare=True, save_path=save_path_best)
+    slog.log_results_to_csv([{'iter': i, 'individual': shelp.normalise(np.array(best[0])), 'fitness': best[1], 'fitness_order': best[2]}], ranking_by=add_ranking_by, n=n, prepare=True, save_path=save_path_best_normalised)
+
 
 
