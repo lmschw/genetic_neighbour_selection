@@ -1,6 +1,14 @@
 import numpy as np
 import random
 
+def get_alpha_for_n(n, ranking_by, has_own=False, has_random=False):
+    size = (n-1) * np.count_nonzero(ranking_by)
+    if has_own:
+        size += 1
+    if has_random:
+        size += 1
+    return 0.14 / size
+
 def get_noise_amplitude_value_for_percentage(percentage):
     """
     Computes the noise amplitude for a given percentage.

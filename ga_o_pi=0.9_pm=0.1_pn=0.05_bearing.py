@@ -7,7 +7,6 @@ import services.service_logging as slog
 import services.service_helper as shelp
 
 n = 10
-alpha = 0.005
 prob_init = 0.9
 prob_mut = 0.1
 prob_intro = 0.05
@@ -23,6 +22,8 @@ add_ranking_by = [False, False, True]
 add_own = True
 add_random = False
 bounds = [-5, 5]
+
+alpha = sprep.get_alpha_for_n(n=n, ranking_by=add_ranking_by, has_own=add_own, has_random=add_random)
 
 tmax = 10000
 radius = 100
