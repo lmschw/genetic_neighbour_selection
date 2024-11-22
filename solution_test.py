@@ -5,6 +5,7 @@ from animator.animator_matplotlib import MatplotlibAnimator
 from evaluator.evaluator_multi_comp import EvaluatorMultiAvgComp
 from model.run_model import RunModel
 import services.service_saved_run_model as ssave
+import services.service_saved_c_values as ssavedc
 import services.service_preparation as sprep
 
 add_own_orientations = True
@@ -17,6 +18,10 @@ test_norm = np.array([-0.013081037,	-0.036045735,	-0.000323752,	0.02219825081786
 best_individual = test_norm
 
 base_filename = "test_middle_limited_6"
+location = "c:/Users/lschw/Downloads/results_lower_speed/"
+base_filename = "results_lower_speed/best_test_ga_disorder_n=10_pi=0.9_pm=0.1_pn=0.05_g=20_pop=30_noise=1_speed=0.1_normalised"
+test_norm = ssavedc.load_solution_as_nparray(iter=100, filepath=f"{location}{base_filename}.csv")
+
 
 tmax = 10000
 n = 10
