@@ -25,10 +25,10 @@ bounds = [-5, 5]
 
 alpha = sprep.get_alpha_for_n(n=n, ranking_by=add_ranking_by, has_own=add_own, has_random=add_random)
 
-tmax = 10000
+tmax = 2000
 radius = 100
 noise_percentage = 1
-speed = 0.1
+speed = 0.5
 density = 0.01
 
 num_c_values = np.count_nonzero(np.array(add_ranking_by)) * (n-1)
