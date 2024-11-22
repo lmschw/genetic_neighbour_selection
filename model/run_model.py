@@ -72,7 +72,7 @@ class RunModel:
         """
         return np.random.normal(scale=self.noise, size=(self.number_particles, len(self.domain_size)))
     
-    def __create_sorted_orientations_array(self, positions, orientations):
+    def create_sorted_orientations_array(self, positions, orientations):
         """
         Sorts the orientations by orientation differences, distances and bearings. Then combines these three rankings into a single array and adds the particle's
         own orientation and a random orientation as needed.
@@ -135,7 +135,7 @@ class RunModel:
         Returns:
             A numpy array containing the new orientation of every particle.
         """
-        sorted_orientations = self.__create_sorted_orientations_array(positions=positions, orientations=orientations)
+        sorted_orientations = self.create_sorted_orientations_array(positions=positions, orientations=orientations)
         applied_orientations = np.tensordot(sorted_orientations, self.c_values, axes=(1, 0))
 
         return sorient.normalize_orientations(applied_orientations)

@@ -143,16 +143,7 @@ class GeneticAlgorithm:
                 initialState = sprep.create_ordered_initial_distribution_equidistanced_individual(domain_size=self.domain_size, number_particles=self.number_particles)
             else:
                 initialState = (None, None, None)
-            simulator = RunModel(domain_size=self.domain_size,
-                                radius=self.radius,
-                                noise=self.noise,
-                                speed=self.speed,
-                                number_particles=self.number_particles,
-                                c_values=c_values,
-                                add_ranking_by=self.add_ranking_by,
-                                add_own_orientation=self.add_own_orientation,
-                                add_random=self.add_random,
-                                events=self.events)
+            simulator = self.create_run_model(c_values=c_values)
             simulation_data = simulator.simulate(tmax=self.tmax, initialState=initialState)
             _, _, orientations = simulation_data
             [results[t].append(sorient.compute_global_order(orientations[t])) for t in range(self.tmax)]
