@@ -101,13 +101,13 @@ class GeneticAlgorithm:
 
         print(f"dom={self.domain_size}, d={self.density}, n={self.number_particles}")
 
-    def __create_initial_population(self):
+    def create_initial_population(self):
         rand_pop = np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
         if self.zero_choice_probability_initial != None:
             rand_pop[np.random.rand(*rand_pop.shape) < self.zero_choice_probability_initial] = 0
         return rand_pop
     
-    def __get_orientation_difference_threshold_contribution(self, orientations):
+    def get_orientation_difference_threshold_contribution(self, orientations):
         if self.orientations_difference_threshold == 2*np.pi:
             return 0 # in this case, they are allowed to turn as much as they like
         diff_gt_threshold = []
@@ -123,9 +123,21 @@ class GeneticAlgorithm:
             return percentage_flipflop * 10
         return 0
 
-    def __fitness_function(self, c_values):
+    def create_run_model(self, c_values):
+        return RunModel(domain_size=self.domain_size,
+                                radius=self.radius,
+                                noise=self.noise,
+                                speed=self.speed,
+                                number_particles=self.number_particles,
+                                c_values=c_values,
+                                add_ranking_by=self.add_ranking_by,
+                                add_own_orientation=self.add_own_orientation,
+                                add_random=self.add_random,
+                                events=self.events)
+    
+    def fitness_function(self, c_values):
         results = {t: [] for t in range(self.tmax)}
-        c_values = self.__update_c_values(c_values)
+        c_values = self.update_c_values(c_values)
         for i in range(self.num_iterations_per_individual):
             if self.start_order == 1 or (self.start_order == None and i < (self.num_iterations_per_individual/2)):
                 initialState = sprep.create_ordered_initial_distribution_equidistanced_individual(domain_size=self.domain_size, number_particles=self.number_particles)
@@ -159,9 +171,9 @@ class GeneticAlgorithm:
             part2_target_integral = integrate.simpson(y=target[self.changeover_point_timestep: self.tmax], x=range(self.changeover_point_timestep, self.tmax))
 
             fitness = (np.absolute(part1_target_integral-part1_results_integral) + np.absolute(part2_target_integral-part2_results_integral)) / self.tmax
-        return fitness, fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)        
+        return fitness, fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.get_orientation_difference_threshold_contribution(orientations=orientations)        
 
-    def __mutation(self, x):
+    def mutation(self, x):
         noise = np.random.normal(0, self.sigma, x.shape) 
         mutated_with_noise = x + noise
 
@@ -174,24 +186,24 @@ class GeneticAlgorithm:
             mutated_with_noise = np.where((rands > (1-self.zero_choice_probability_mutation)), 0, mutated_with_noise)        
         return mutated_with_noise
     
-    def __check_bounds(self, mutated, bounds):
+    def check_bounds(self, mutated, bounds):
         mutated_bound = np.clip(mutated, bounds[0], bounds[1])
         return mutated_bound
     
-    def __crossover(self, p1, p2):
+    def crossover(self, p1, p2):
         pt = random.randint(1, len(p1)-2)
         a = list(p1[:pt])
         b = list(p2[pt:])
         a.extend(b)
         return np.array(a)
     
-    def __update_c_values(self, c_values):
+    def update_c_values(self, c_values):
         c_values = np.where(((c_values >= self.update_to_zero_bounds[0]) & (c_values <= self.update_to_zero_bounds[1])), 0, c_values)
         if self.use_norm == True:
             c_values = shelp.normalise(c_values, norm='l1')
         return c_values
     
-    def __plot_fitnesses(self, fitnesses, save_path_plots=None):
+    def plot_fitnesses(self, fitnesses, save_path_plots=None):
         plt.plot(fitnesses)
         if save_path_plots:
             plt.savefig(f"{save_path_plots}.svg")
@@ -208,14 +220,14 @@ class GeneticAlgorithm:
 
             rng = np.random.default_rng()
 
-            population  = self.__create_initial_population()
+            population  = self.create_initial_population()
 
             last_improvement_at_gen = 0
             best_fitnesses_for_generations = []
             prev_fitness = None
             for generation in range(self.num_generations):
                 print(f"gen {generation+1}/{self.num_generations}")
-                fitnesses_both = np.array([self.__fitness_function(individual) for individual in population])
+                fitnesses_both = np.array([self.fitness_function(individual) for individual in population])
 
                 fitnesses_order = fitnesses_both[:, 0]
                 fitnesses = fitnesses_both[:, 1]
@@ -251,12 +263,12 @@ class GeneticAlgorithm:
                 # TODO prohibit choosing the same parent twice
                 p2 = rng.choice(a=population, size=(self.population_size-self.elite_size), axis=0)
                 for j in range(len(p1)):
-                    child = self.__crossover(p1=p1[j], p2=p2[j])
-                    child = self.__mutation(child)
-                    child = self.__check_bounds(child, bounds=self.bounds)
+                    child = self.crossover(p1=p1[j], p2=p2[j])
+                    child = self.mutation(child)
+                    child = self.check_bounds(child, bounds=self.bounds)
                     new_population.append(child)
 
                 population = np.array(new_population)
 
-            self.__plot_fitnesses(best_fitnesses_for_generations, save_path_plots)
+            self.plot_fitnesses(best_fitnesses_for_generations, save_path_plots)
             return [best_individual, best_fitness, fitnesses_order[best_individual_index]]

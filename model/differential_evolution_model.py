@@ -90,13 +90,13 @@ class DifferentialEvolution:
 
         print(f"dom={self.domain_size}, d={self.density}, n={self.number_particles}")
 
-    def __create_initial_population(self):
+    def create_initial_population(self):
         rand_pop = np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
         if self.zero_choice_probability != None:
             rand_pop[np.random.rand(*rand_pop.shape) < self.zero_choice_probability] = 0
         return rand_pop
     
-    def __get_orientation_difference_threshold_contribution(self, orientations):
+    def get_orientation_difference_threshold_contribution(self, orientations):
         if self.orientations_difference_threshold == 2*np.pi:
             return 0 # in this case, they are allowed to turn as much as they like
         diff_gt_threshold = []
@@ -112,9 +112,9 @@ class DifferentialEvolution:
             return percentage_flipflop * 10
         return 0
 
-    def __fitness_function(self, c_values):
+    def fitness_function(self, c_values):
         results = {t: [] for t in range(self.tmax)}
-        c_values = self.__update_c_values(c_values)
+        c_values = self.update_c_values(c_values)
         for i in range(self.num_iterations_per_individual):
             if self.start_order == 1 or (self.start_order == None and i < (self.num_iterations_per_individual/2)):
                 initialState = sprep.create_ordered_initial_distribution_equidistanced_individual(domain_size=self.domain_size, number_particles=self.number_particles)
@@ -138,29 +138,29 @@ class DifferentialEvolution:
         
         fitness = np.absolute(target_integral-results_integral) / self.tmax
 
-        return fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.__get_orientation_difference_threshold_contribution(orientations=orientations)
+        return fitness + (self.c_values_norm_factor * shelp.normalise(values=c_values, norm='l0')) + self.get_orientation_difference_threshold_contribution(orientations=orientations)
     
-    def __mutation(self, x, F):
+    def mutation(self, x, F):
         return x[0] + F * (x[1] - x[2])
     
-    def __check_bounds(self, mutated, bounds):
+    def check_bounds(self, mutated, bounds):
         mutated_bound = np.clip(mutated, bounds[0], bounds[1])
         return mutated_bound
     
-    def __crossover(self, mutated, target, cr):
+    def crossover(self, mutated, target, cr):
         # generate a uniform random value for every dimension
         p = np.random.rand(self.c_value_size)
         # generate trial vector by binomial crossover
         trial = [mutated[i] if p[i] < cr else target[i] for i in range(self.c_value_size)]
         return np.array(trial)
     
-    def __update_c_values(self, c_values):
+    def update_c_values(self, c_values):
         c_values = np.where(((c_values >= self.update_to_zero_bounds[0]) & (c_values <= self.update_to_zero_bounds[1])), 0, c_values)
         if self.use_norm == True:
             c_values = shelp.normalise(c_values, norm='l1')
         return c_values
     
-    def __plot_fitnesses(self, fitnesses, save_path_plots=None):
+    def plot_fitnesses(self, fitnesses, save_path_plots=None):
         plt.plot(fitnesses)
         if save_path_plots:
             plt.savefig(f"{save_path_plots}.svg")
@@ -174,8 +174,8 @@ class DifferentialEvolution:
             headers = slog.create_headers(self.c_value_size)
             w.writerow(headers)
             log.flush()
-            population  = self.__create_initial_population()
-            fitnesses = [self.__fitness_function(individual) for individual in population]
+            population  = self.create_initial_population()
+            fitnesses = [self.fitness_function(individual) for individual in population]
             best_individual = population[np.argmin(fitnesses)]
             best_fitness = min(fitnesses)
             prev_fitness = best_fitness
@@ -194,11 +194,11 @@ class DifferentialEvolution:
                 for ind in range(self.population_size):
                     candidates = [candidate for candidate in range(self.population_size) if candidate != ind]
                     a, b, c = population[np.random.choice(candidates, 3, replace=False)]
-                    mutated = self.__mutation([a, b, c], self.mutation_scale_factor)
-                    mutated = self.__check_bounds(mutated, self.bounds)
-                    trial = self.__crossover(mutated, population[ind], self.crossover_rate)
+                    mutated = self.mutation([a, b, c], self.mutation_scale_factor)
+                    mutated = self.check_bounds(mutated, self.bounds)
+                    trial = self.crossover(mutated, population[ind], self.crossover_rate)
                     target_existing = fitnesses[ind]
-                    target_trial = self.__fitness_function(trial)
+                    target_trial = self.fitness_function(trial)
                     if target_trial < target_existing:
                         population[ind] = trial
                         fitnesses[ind] = target_trial
@@ -221,5 +221,5 @@ class DifferentialEvolution:
                     print(f"Early stopping at iteration {iter} after {self.early_stopping_after_gens} generations without improvement")
                     break
 
-            self.__plot_fitnesses(best_fitnesses_for_generations, save_path_plots)
+            self.plot_fitnesses(best_fitnesses_for_generations, save_path_plots)
             return [best_individual, best_fitness]
