@@ -97,7 +97,7 @@ class GeneticAlgorithm:
         if self.add_random:
             self.c_value_size += 1
 
-        self.selection_probabilities = shelp.normalise([1/(i+1) for i in range(self.population_size)], norm='l1')
+        self.selection_probabilities = shelp.normalise(np.array([1/(i+1) for i in range(self.population_size)]), norm='l1')
 
         print(f"dom={self.domain_size}, d={self.density}, n={self.number_particles}")
 

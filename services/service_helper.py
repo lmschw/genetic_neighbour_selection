@@ -17,6 +17,9 @@ def normalise(values, norm='l1'):
     """
     if norm == 'l0':
         return np.count_nonzero(values)
+    
+    if values.ndim == 1:
+        values = [values]
 
-    normalised_vector = preprocessing.normalize(X=[values], norm=norm)[0]
+    normalised_vector = preprocessing.normalize(X=values, norm=norm)[0]
     return normalised_vector
