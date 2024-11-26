@@ -97,7 +97,8 @@ def prepare_individuals_for_csv_logging(dict_list, ranking_by=[True, True, True]
     Returns:
         A list of dictionaries containing no numpy arrays but instead spread to more items.
     """
-    end_ranked = np.count_nonzero(np.array(ranking_by))*(n-1)
+    if n != None:
+        end_ranked = np.count_nonzero(np.array(ranking_by))*(n-1)
     new_dict_list = []
     for dict in dict_list:
         new_dict = {}
