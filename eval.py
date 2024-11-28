@@ -12,11 +12,13 @@ from sklearn.metrics import davies_bouldin_score, silhouette_score
 
 #location = "results/own_order_basic_n=5/"
 #base_filepath = f"{location}best_own_order_basic_n=5_b5_normalised"
-base_filepath = f"results/19.11.24/best_test_ga_disorder_n=10_pi=0.9_pm=0.1_pn=0.05_g=20_pop=30_noise=1_speed=0.1_normalised"
+location = f"c:/Users/lschw/Downloads/individual_ranking/26.11.24/"
+base_filepath = f"best_test_ga_middle_orientation_n=10_pi=0.9_pm=0.1_pn=0.05_g=20_pop=30_noise=1_speed=0.5_normalised"
+loading_filepath = f"{location}{base_filepath}"
 
-df = pd.read_csv(f"{base_filepath}.csv")
+df = pd.read_csv(f"{loading_filepath}.csv")
 
-n_clusters = 4
+n_clusters = 2
 
 print(df.head())
 
