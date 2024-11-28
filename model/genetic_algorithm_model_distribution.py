@@ -57,6 +57,15 @@ class GeneticAlgorithmDistribution(GeneticAlgorithm):
                          introduce_new_values_probability=introduce_new_values_probability, events=events)
         self.c_value_size = 7
 
+    def create_initial_population(self):
+        rand_pop = np.random.uniform(low=self.bounds[0], high=self.bounds[1], size=((self.population_size, self.c_value_size)))
+        rand_pop[-1] = rand_pop[-1] / self.bounds[1]
+        return rand_pop
+    
+    def check_bounds(self, mutated, bounds):
+        mutated_bound = np.clip(mutated, bounds[0], bounds[1])
+        mutated_bound[-1] = mutated_bound[-1] / self.bounds[1]
+        return mutated_bound
 
     def create_run_model(self, c_values):
         return DistributionRunModel(domain_size=self.domain_size,

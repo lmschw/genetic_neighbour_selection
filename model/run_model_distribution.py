@@ -52,5 +52,5 @@ class DistributionRunModel(RunModel):
 
         angles = sorient.compute_angles_for_orientations(orientations=orientations)
         new_angles = angles * factors_overall_normalised
-
-        return sorient.compute_uv_coordinates_for_list(angles=new_angles)
+        # TODO figure out best bounds for Gaussian & look up other function generation methods
+        return self.c_values[6] * orientations + (1-self.c_values[6]) * sorient.compute_uv_coordinates_for_list(angles=new_angles)
