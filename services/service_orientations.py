@@ -82,6 +82,8 @@ def compute_angles_for_orientations(orientations):
     Returns:
         A float representin the angle in radians.
     """
+    if orientations.ndim == 3:
+        return np.arctan2(orientations[:, :, 1], orientations[:, :, 0])
     return np.arctan2(orientations[:, 1], orientations[:, 0])
 
 
