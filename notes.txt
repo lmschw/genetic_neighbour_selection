@@ -30,3 +30,13 @@
 eval:
 - pca
 - hierarchical clustering
+
+29.11.:
+- pursue AE model adaptation
+    - use the kernel function from the other model as alpha or beta
+- also pursue function model:
+    - try using bins instead of continuous functions, i.e. a grid/cube with a coefficient for every bin (orientation diff, distance, 
+        bearing diff as the axes) and then just look up the coefficient that is suitable for the neighbour
+    - use a combined function for all three axes if not using bins
+    - allow the model to pick from a variety of functions as well as the function parameters (e.g. mu and sigma for Gaussian)
+    - only use positive values instead of a neg-pos range
