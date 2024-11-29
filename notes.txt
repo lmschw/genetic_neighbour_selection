@@ -46,4 +46,5 @@ eval:
 
 - tasks:
     - ask Eliseo for paper with implementation of AE 
-    - 
+    - link overleaf to uni 
+    - create new overleaf project with GECCO template (https://gecco-2025.sigevo.org/Paper-Submission-Instructions)
