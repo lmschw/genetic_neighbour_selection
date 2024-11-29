@@ -40,3 +40,10 @@ eval:
     - use a combined function for all three axes if not using bins
     - allow the model to pick from a variety of functions as well as the function parameters (e.g. mu and sigma for Gaussian)
     - only use positive values instead of a neg-pos range
+- general:
+    - try using only positive values
+    - try using 5 agents
+
+- tasks:
+    - ask Eliseo for paper with implementation of AE 
+    - 
