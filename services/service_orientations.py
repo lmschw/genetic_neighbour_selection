@@ -47,6 +47,9 @@ def get_differences(array, domain_size):
     rij = rij - domain_size*np.rint(rij/domain_size) #minimum image convention
     return np.sum(rij**2,axis=2)
 
+def get_differences_sqrt(array, domain_size):
+    return np.sqrt(get_differences(array, domain_size))
+
 def remove_diagonal(matrix):
     """
     Removes the diagnoal from a matrix.
