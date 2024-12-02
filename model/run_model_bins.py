@@ -89,6 +89,7 @@ class BinRunModel(RunModel):
         factors_overall_normalised = shelp.normalise(factors_overall, norm='l1')
 
         angles = sorient.compute_angles_for_orientations(orientations=orientations)
-        new_angles = angles * factors_overall_normalised
+        angles_enhanced = np.array(self.number_particles * [angles])
+        new_angles = np.sum(np.tensordot(angles_enhanced, factors_overall_normalised, axes=1), axis=1)
         # TODO figure out best bounds for Gaussian & look up other function generation methods
         return self.own_contribution_factor * orientations + (1-self.own_contribution_factor) * sorient.compute_uv_coordinates_for_list(angles=new_angles)

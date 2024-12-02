@@ -18,13 +18,13 @@ num_iters = 1
 num_iters_per_ind = 1
 early_stopping = None
 
-add_ranking_by = [True, False, False]
+add_ranking_by = [True, True, True]
 add_own = True
 add_random = False
 bounds = [-1, 1]
 #bin_bounds = [0, 0.33, 0.66, 1]
 bin_bounds = [None]
-num_bins = 9
+num_bins = 3
 
 num_c_values = 27
 if add_own:
