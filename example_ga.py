@@ -11,6 +11,7 @@ alpha = 0.005
 prob_init = 0.8
 prob_mut = 0.1
 prob_intro = 0.1
+start_order = 0
 target_order = 1
 population_size = 10
 num_gens = 2
@@ -47,7 +48,7 @@ slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=
 slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True, n=n, has_own=add_own, has_random=add_random, ranking_by=add_ranking_by), save_path=save_path_best_normalised)
 
 for i in range(num_iters):
-    model = GeneticAlgorithm(radius=100, 
+    model = GeneticAlgorithm(radius=10, 
                         tmax=1000, 
                         density=0.01, 
                         number_particles=n,
@@ -63,6 +64,7 @@ for i in range(num_iters):
                         num_iterations_per_individual=num_iters_per_ind,
                         population_size=population_size,
                         early_stopping_after_gens=early_stopping,
+                        start_order=start_order,
                         target_order=target_order)
 
     best = model.run(save_path_log=save_path_general, save_path_plots=save_path_plot)

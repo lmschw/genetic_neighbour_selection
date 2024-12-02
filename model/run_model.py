@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 import services.service_orientations as sorient
+import services.service_helper as shelp
 
 class RunModel:
     """
@@ -72,7 +73,7 @@ class RunModel:
         """
         return np.random.normal(scale=self.noise, size=(self.number_particles, len(self.domain_size)))
     
-    def create_sorted_orientations_array(self, positions, orientations):
+    def create_sorted_orientations_array(self, positions, orientations, as_angles=True):
         """
         Sorts the orientations by orientation differences, distances and bearings. Then combines these three rankings into a single array and adds the particle's
         own orientation and a random orientation as needed.
@@ -85,44 +86,51 @@ class RunModel:
             A numpy array containing the orientations of all particles to correspond to the c_values.
         """
 
+        angles = sorient.compute_angles_for_orientations(orientations=orientations)
+
         # we remove the diagonal after the sorting to remove the particle's own information
-        diagonal_mask = np.full((self.number_particles, self.number_particles), False)
-        np.fill_diagonal(diagonal_mask, True)
+        mask = np.full((self.number_particles, self.number_particles), False)
+        np.fill_diagonal(mask, True)
+
+        # we also remove any particles that are not within the perception radius
+        neighbours = shelp.get_neighbours(positions=positions, domain_size=self.domain_size, radius=self.radius)
+        mask[neighbours == False] = True
 
         orients = []
         if self.rank_by_orientation == True:
-            orientation_differences = np.ma.MaskedArray(sorient.get_differences(orientations, self.domain_size), mask=diagonal_mask)
-            orientation_diff_sorted_indices = np.argsort(orientation_differences, axis=1)
-            orientation_diff_sorted_indices_without_diagonal = orientation_diff_sorted_indices[:, :-1]
-            orientations_by_orientation_diff = np.array(orientations[orientation_diff_sorted_indices_without_diagonal])
-            orients = orientations_by_orientation_diff
+            orientation_differences = np.ma.MaskedArray(sorient.get_angle_differences(angles, return_absolute=True), mask=mask)
+            orientation_diff_neighbour = [angles[np.argsort(orientation_differences[i].compressed())] for i in range(len(orientation_differences))]
+            orientation_diff_neighbour_padded = [np.pad(orientation_diff_neighbour[i], (0,self.number_particles-1-len(orientation_diff_neighbour[i])), mode='constant', constant_values=0) for i in range(len(orientation_diff_neighbour))]
+            orients = orientation_diff_neighbour_padded
 
         if self.rank_by_distance == True:
-            distances = np.ma.MaskedArray(sorient.get_differences(positions, self.domain_size), mask=diagonal_mask)
-            distances_sorted_indices = np.argsort(distances, axis=1)
-            distances_sorted_indices_without_diagonal = distances_sorted_indices[:, :-1]
-            orientations_by_distance = np.array(orientations[distances_sorted_indices_without_diagonal])
+            distances = np.ma.MaskedArray(sorient.get_differences(positions, self.domain_size), mask=mask)
+            orientations_by_distance = [angles[np.argsort(distances[i].compressed())] for i in range(len(distances))]
+            orientations_by_distance_padded = [np.pad(orientations_by_distance[i], (0,self.number_particles-1-len(orientations_by_distance[i])), mode='constant', constant_values=0) for i in range(len(orientations_by_distance))]
+
             if len(orients) == 0:
-                orients = orientations_by_distance
+                orients = orientations_by_distance_padded
             else:
-                orients = np.append(orients, orientations_by_distance, axis=1)
+                orients = np.append(orients, orientations_by_distance_padded, axis=1)
 
         if self.rank_by_bearing == True:
-            bearings = np.ma.MaskedArray(self.compute_bearings(positions=positions), mask=diagonal_mask)
-            bearings_sorted_indices = np.argsort(bearings, axis=1)
-            bearings_sorted_indices_without_diagonal = bearings_sorted_indices[:, :-1]
-            orientations_by_bearing = np.array(orientations[bearings_sorted_indices_without_diagonal])
+            bearings = np.ma.MaskedArray(self.compute_bearings(positions=positions), mask=mask)
+            orientations_by_bearings = [angles[np.argsort(bearings[i].compressed())] for i in range(len(bearings))]
+            orientations_by_bearings_padded = [np.pad(orientations_by_bearings[i], (0,self.number_particles-1-len(orientations_by_bearings[i])), mode='constant', constant_values=0) for i in range(len(orientations_by_bearings))]
+
             if len(orients) == 0:
-                orients = orientations_by_bearing
+                orients = orientations_by_bearings_padded
             else:
-                orients = np.append(orients, orientations_by_bearing, axis=1)
+                orients = np.append(orients, orientations_by_bearings_padded, axis=1)
                 
         if self.add_own_orientation == True:
-            orients = np.append(orients, orientations[:, np.newaxis, :], axis=1)
+            orients = np.append(orients, angles[:, np.newaxis], axis=1)
         if self.add_random == True:
             rands = np.random.uniform(low=-1, high=1, size=(self.number_particles, 2))
-            orients = np.append(orients, rands[:, np.newaxis, :], axis=1)
-        return orients
+            orients = np.append(orients, rands[:, np.newaxis], axis=1)
+        if as_angles == True:
+            return orients
+        return sorient.compute_uv_coordinates_for_list(angles=orients)
     
     def compute_new_orientations(self, positions, orientations):
         """
@@ -135,8 +143,13 @@ class RunModel:
         Returns:
             A numpy array containing the new orientation of every particle.
         """
-        sorted_orientations = self.create_sorted_orientations_array(positions=positions, orientations=orientations)
-        applied_orientations = np.tensordot(sorted_orientations, self.c_values, axes=(1, 0))
+        neighbours = shelp.get_neighbours(positions=positions, domain_size=self.domain_size, radius=self.radius)
+
+        # for non-neighbours, this angle will always be 0, cancelling them out in the multiplication
+        sorted_orientation_angles = self.create_sorted_orientations_array(positions=positions, orientations=orientations, as_angles=True)
+    
+        applied_orientations = np.tensordot(sorted_orientation_angles, self.c_values, axes=(1, 0))
+        applied_orientations = sorient.compute_uv_coordinates_for_list(angles=applied_orientations)
 
         return sorient.normalize_orientations(applied_orientations)
     
