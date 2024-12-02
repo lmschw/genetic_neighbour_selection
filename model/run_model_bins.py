@@ -62,19 +62,28 @@ class BinRunModel(RunModel):
         bins_bearing = self.find_bins(factors=bearings, max=2*np.pi)
 
         if np.count_nonzero(self.add_ranking_by) == 3:
-            return self.c_values[bins_orientation_difference, bins_position_difference, bins_bearing]
+            vals = self.c_values[bins_orientation_difference, bins_position_difference, bins_bearing]
         elif self.add_ranking_by[0] and self.add_ranking_by[1]:
-            return self.c_values[bins_orientation_difference, bins_position_difference]
+            vals = self.c_values[bins_orientation_difference, bins_position_difference]
         elif self.add_ranking_by[0] and self.add_ranking_by[2]:
-            return self.c_values[bins_orientation_difference, bins_bearing]
+            vals = self.c_values[bins_orientation_difference, bins_bearing]
         elif self.add_ranking_by[1] and self.add_ranking_by[2]:
-            return self.c_values[bins_position_difference, bins_bearing]
+            vals = self.c_values[bins_position_difference, bins_bearing]
         elif self.add_ranking_by[0]:
-            return self.c_values[bins_orientation_difference]
+            vals = self.c_values[bins_orientation_difference]
         elif self.add_ranking_by[1]:
-            return self.c_values[bins_position_difference]
+            vals = self.c_values[bins_position_difference]
         else:
-            return self.c_values[bins_bearing]
+            vals = self.c_values[bins_bearing]
+        
+        # if the position is further away than the radius, it will not fit into any bin and therefore will have -1
+        # those cases are set to 0 to make sure they are ignored. Such a correction is not needed for orientations
+        # and bearings because these are circular. However, once a field of vision is included, TODO bearings will
+        # need to be checked
+        radius_corrected = np.where((bins_position_difference == -1), 0, vals)
+
+        return radius_corrected
+
 
     def compute_new_orientations(self, positions, orientations):
         orientation_differences = sorient.get_differences(orientations, self.domain_size)

@@ -6,6 +6,7 @@ import services.service_logging as slog
 import services.service_helper as shelp
 
 n = 10
+radius = 10
 alpha = 0.005
 prob_init = 0.9
 prob_mut = 0.1
@@ -50,7 +51,7 @@ slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=
 slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True, n=n, has_own=add_own, has_random=add_random, ranking_by=add_ranking_by), save_path=save_path_best_normalised)
 
 for i in range(num_iters):
-    model = GeneticAlgorithmDistribution(radius=46, 
+    model = GeneticAlgorithmDistribution(radius=radius, 
                         tmax=1000, 
                         density=0.01, 
                         number_particles=n,
