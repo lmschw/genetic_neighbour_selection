@@ -21,6 +21,9 @@ def normalise(values, norm='l1', axis=1):
         return np.count_nonzero(values)
     
     is_one_dim = False
+    if len(values) == 0:
+        return values
+    
     if values.ndim == 1:
         is_one_dim = True
         values = [values]
