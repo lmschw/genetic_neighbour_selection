@@ -26,7 +26,7 @@ bounds = [-5, 5]
 alpha = sprep.get_alpha_for_n(n=n, ranking_by=add_ranking_by, has_own=add_own, has_random=add_random)
 
 tmax = 2000
-radius = 100
+radius = 10
 noise_percentage = 1
 speed = 0.5
 density = 0.01
@@ -38,11 +38,11 @@ if add_random:
     num_c_values += 1
 
 if target_order == 1:
-    postfix = f"_test_ga_order_bearing_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_order_bearing_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 elif target_order == 0:
-    postfix = f"_test_ga_disorder_bearing_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_disorder_bearing_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 else:
-    postfix = f"_test_ga_middle_bearing_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_middle_bearing_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 
 print(postfix)
 

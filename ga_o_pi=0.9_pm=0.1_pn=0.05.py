@@ -24,7 +24,7 @@ add_random = False
 bounds = [-5, 5]
 
 tmax = 10000
-radius = 100
+radius = 10
 noise_percentage = 1
 speed = 0.1
 density = 0.01
@@ -36,11 +36,11 @@ if add_random:
     num_c_values += 1
 
 if target_order == 1:
-    postfix = f"_test_ga_order_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_order_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 elif target_order == 0:
-    postfix = f"_test_ga_disorder_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_disorder_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 else:
-    postfix = f"_test_ga_middle_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_middle_n={n}_pi={prob_init}_pm={prob_mut}_pn={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 
 print(postfix)
 
