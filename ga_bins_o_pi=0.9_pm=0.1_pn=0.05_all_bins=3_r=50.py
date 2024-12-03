@@ -39,11 +39,11 @@ if add_random:
     num_c_values += 1
 
 if target_order == 1:
-    postfix = f"_test_ga_bins_order_n={n}_bounds={bounds}_alpha={alpha}_bins={num_bins}_pinit={prob_init}_pmut={prob_mut}_pintro={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_bins_order_n={n}_bounds={bounds}_alpha={alpha}_bins={num_bins}_pinit={prob_init}_pmut={prob_mut}_pintro={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 elif target_order == 0:
-    postfix = f"_test_ga_bins_disorder_n={n}_bounds={bounds}_alpha={alpha}_bins={num_bins}_pinit={prob_init}_pmut={prob_mut}_pintro={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_bins_disorder_n={n}_bounds={bounds}_alpha={alpha}_bins={num_bins}_pinit={prob_init}_pmut={prob_mut}_pintro={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 else:
-    postfix = f"_test_ga_bins_middle_n={n}_bounds={bounds}_alpha={alpha}_bins={num_bins}_pinit={prob_init}_pmut={prob_mut}_pintro={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}"
+    postfix = f"_test_ga_bins_middle_n={n}_bounds={bounds}_alpha={alpha}_bins={num_bins}_pinit={prob_init}_pmut={prob_mut}_pintro={prob_intro}_g={num_gens}_pop={population_size}_noise={noise_percentage}_speed={speed}_r={radius}"
 
 print(postfix)
 
