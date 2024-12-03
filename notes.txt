@@ -48,3 +48,8 @@ eval:
     - ask Eliseo for paper with implementation of AE 
     - link overleaf to uni 
     - create new overleaf project with GECCO template (https://gecco-2025.sigevo.org/Paper-Submission-Instructions)
+
+03.12.:
+- try evolving the weights for a neural network coming up with the coefficient for every individual (i.e. feeding od, dist and bearing to a NN and getting back the coefficient)
+- try a probability distribution instead
+- try subsampling for larger agent populations (e.g. k=10, select randomly/preferentially by relationship etc.)
