@@ -85,6 +85,14 @@ def test_normalise_2d_l1():
         assert sum(norm_2d_pos[row]) >= 0.999, "test_normalise_2d_l1: Sum should be close to one for positive values"
         assert sum(np.absolute(norm_2d_neg_pos[row])) >= 0.999, "test_normalise_2d_l1: Sum should be close to one for mixed values"
 
+def test_normalise():
+    # 1d array
+    test_normalise_l0()
+    test_normalise_l1()
+    # 2d array
+    test_normalise_2d_l0()
+    test_normalise_2d_l1()
+
 def test_get_neighbours():
     domain_size = (50, 50)
     # no neighbours
@@ -151,12 +159,6 @@ def test_get_neighbours():
 
 
 def run_all():
-    print("Tests for service_helper starting")
-    print("Tests for method 'normalise()' starting")
-    test_normalise_l0()
-    test_normalise_l1()
-    test_normalise_2d_l0()
-    test_normalise_2d_l1()
-    print("Tests for method 'get_neighbours() starting")
+    test_normalise()
     test_get_neighbours()
-    print("Everything passed")
+    print("Everything passed for service_helper")
