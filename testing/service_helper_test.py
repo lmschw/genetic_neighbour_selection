@@ -85,6 +85,71 @@ def test_normalise_2d_l1():
         assert sum(norm_2d_pos[row]) >= 0.999, "test_normalise_2d_l1: Sum should be close to one for positive values"
         assert sum(np.absolute(norm_2d_neg_pos[row])) >= 0.999, "test_normalise_2d_l1: Sum should be close to one for mixed values"
 
+def test_get_neighbours():
+    domain_size = (50, 50)
+    # no neighbours
+    positions = np.array([[0, 0], [10, 10], [20, 20], [30, 30], [40, 40]])
+    expected = np.array([[True, False, False, False, False],
+                         [False, True, False, False, False],
+                         [False, False, True, False, False],
+                         [False, False, False, True, False],
+                         [False, False, False, False, True]])
+    result = shelp.get_neighbours(positions=positions, domain_size=domain_size, radius=5)
+    equal = True
+    for i in range(len(positions)):
+        for j in range(len(positions)):
+            if result[i][j] != expected[i][j]:
+                equal = False
+                break
+    assert equal == True
+
+    # single neighbour
+    positions = np.array([[0, 0], [2, 2], [20, 20], [22, 22]])
+    expected = np.array([[True, True, False, False],
+                         [True, True, False, False],
+                         [False, False, True, True],
+                         [False, False, True, True],])
+    result = shelp.get_neighbours(positions=positions, domain_size=domain_size, radius=5)
+    equal = True
+    for i in range(len(positions)):
+        for j in range(len(positions)):
+            if result[i][j] != expected[i][j]:
+                equal = False
+                break
+    assert equal == True
+
+    # mixed
+    positions = np.array([[0, 0], [2, 2], [20, 20], [22, 22], [25, 24], [30, 30], [48, 48], [49, 49]])
+    expected = np.array([[True, True, False, False, False, False, True, True],
+                         [True, True, False, False, False, False, False, True],
+                         [False, False, True, True, False, False, False, False],
+                         [False, False, True, True, True, False, False, False],
+                         [False, False, False, True, True, False, False, False],
+                         [False, False, False, False, False, True, False, False],
+                         [True, False, False, False, False, False, True, True],
+                         [True, True, False, False, False, False, True, True]])
+    result = shelp.get_neighbours(positions=positions, domain_size=domain_size, radius=5)
+    equal = True
+    for i in range(len(positions)):
+        for j in range(len(positions)):
+            if result[i][j] != expected[i][j]:
+                equal = False
+                break
+    assert equal == True
+
+    # all neighbours
+    positions = np.array([[0, 0], [10, 10], [20, 20], [30, 30], [40, 40]])
+    expected = np.full((5,5), True)
+    result = shelp.get_neighbours(positions=positions, domain_size=domain_size, radius=50)
+    equal = True
+    for i in range(len(positions)):
+        for j in range(len(positions)):
+            if result[i][j] != expected[i][j]:
+                equal = False
+                break
+    assert equal == True
+
+
 def run_all():
     print("Tests for service_helper starting")
     print("Tests for method 'normalise()' starting")
@@ -92,4 +157,6 @@ def run_all():
     test_normalise_l1()
     test_normalise_2d_l0()
     test_normalise_2d_l1()
+    print("Tests for method 'get_neighbours() starting")
+    test_get_neighbours()
     print("Everything passed")
