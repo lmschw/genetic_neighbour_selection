@@ -47,9 +47,3 @@ def get_neighbours(positions, domain_size, radius):
     """
     rij2 = sorient.get_differences(positions, domain_size)
     return (rij2 <= radius**2)
-
-def pad_array(a, n, min_len, max_len, padding_value=0):
-    if max_len > len(a[0]):
-        minus_diff = np.full((n,max_len-min_len), padding_value)
-        return np.concatenate((a, minus_diff), axis=1)
-    return a
