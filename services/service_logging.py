@@ -30,10 +30,10 @@ def create_headers(len_c_values, n=None, ranking_by=[True, True, True], has_own=
             individual_headers.extend([f"p_{i % n}" for i in range(n-1)])
         if ranking_by[2] == True:
             individual_headers.extend([f"b_{i % n}" for i in range(n-1)])
-        if has_own:
-            individual_headers.append("own")
-        if has_random:
-            individual_headers.append("rand")
+    if has_own:
+        individual_headers.append("own")
+    if has_random:
+        individual_headers.append("rand")
 
     headers.extend(individual_headers)
     headers.append('fitness')
