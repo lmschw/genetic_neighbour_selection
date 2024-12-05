@@ -18,6 +18,8 @@ def normalise(values, norm='l1', axis=1):
         A numpy array with the normalised values.
     """
     if norm == 'l0':
+        if values.ndim == 2:
+            return np.count_nonzero(values, axis=1)
         return np.count_nonzero(values)
     
     is_one_dim = False

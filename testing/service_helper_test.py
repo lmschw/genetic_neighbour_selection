@@ -41,9 +41,55 @@ def test_normalise_l1():
     assert sum(norm_pos) >= 0.999, "test_normalise_l1: Sum should be close to one for positive values"
     assert sum(np.absolute(norm_neg_pos)) >= 0.999, "test_normalise_l1: Sum should be close to one for mixed values"
 
+def test_normalise_2d_l0():
+    vals_2d_zeros = np.zeros((5, 10))
+    vals_2d_pos = np.array([[1, 0, 3, 4, 0, 0, 7, 0, 9, 0],
+                            [0, 3, 0, 0, 0, 7, 8, 9, 0, 11],
+                            [3, 4, 0, 6, 0, 8, 0, 10, 0, 0],
+                            [0, 0, 6, 0, 8, 9, 0, 11, 0, 13],
+                            [5, 6, 0, 0, 0, 10, 0, 12, 0, 14]])
+    vals_2d_neg_pos = np.array([[1, 0, 3, -4, 0, 0, 7, -8, 0, 0],
+                                [0, 3, -4, 0, 0, 7, -8, 0, -10, 0],
+                                [3, 0, 0, -6, 0, 0, 9, -10, 0, -12],
+                                [-4, 0, -6, 0, 0, 9, -10, 0, 0, 13],
+                                [0, -6, 0, -8, 9, -10, 11, 0, 0, 0]])
+    
+    norm_2d_zeros = shelp.normalise(values=vals_2d_zeros, norm='l0')
+    norm_2d_pos = shelp.normalise(values=vals_2d_pos, norm='l0')
+    norm_2d_neg_pos = shelp.normalise(values=vals_2d_neg_pos, norm='l0')
+
+    for row in range(5):
+        assert norm_2d_zeros[row] == 0, "test_normalise_l0: L0 should be zero for all zeros"
+        assert norm_2d_pos[row] ==5, "test_normalise_2d_l0: L0 should be 5 for 5 positive non-zero values"
+        assert norm_2d_neg_pos[row] ==5, "test_normalise_2d_l0: L0 should be 5 for 5 non-zero values"
+
+def test_normalise_2d_l1():
+    vals_2d_zeros = np.zeros((5, 10))
+    vals_2d_pos = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                            [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                            [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                            [4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                            [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]])
+    vals_2d_neg_pos = np.array([[1, -2, 3, -4, 5, -6, 7, -8, 9, -10],
+                                [-2, 3, -4, 5, -6, 7, -8, 9, -10, 11],
+                                [3, -4, 5, -6, 7, -8, 9, -10, 11, -12],
+                                [-4, 5, -6, 7, -8, 9, -10, 11, -12, 13],
+                                [5, -6, 7, -8, 9, -10, 11, -12, 13, -14]])
+    
+    norm_2d_zeros = shelp.normalise(values=vals_2d_zeros, norm='l1')
+    norm_2d_pos = shelp.normalise(values=vals_2d_pos, norm='l1')
+    norm_2d_neg_pos = shelp.normalise(values=vals_2d_neg_pos, norm='l1')
+
+    for row in range(5):
+        assert sum(norm_2d_zeros[row]) == 0, "test_normalise_l1: Sum should be zero for zero values"
+        assert sum(norm_2d_pos[row]) >= 0.999, "test_normalise_2d_l1: Sum should be close to one for positive values"
+        assert sum(np.absolute(norm_2d_neg_pos[row])) >= 0.999, "test_normalise_2d_l1: Sum should be close to one for mixed values"
+
 def run_all():
     print("Tests for service_helper starting")
     print("Tests for method 'normalise()' starting")
     test_normalise_l0()
     test_normalise_l1()
+    test_normalise_2d_l0()
+    test_normalise_2d_l1()
     print("Everything passed")
