@@ -108,13 +108,13 @@ def prepare_individuals_for_csv_logging(dict_list, ranking_by=[True, True, True]
                     if n == None:
                         new_dict[f"individual_{i}"] = v[i]
                     elif ranking_by[0] == True and i < n-1:
-                        new_dict[f"o_{i % n}"] = v[i]
+                        new_dict[f"o_{i % (n-1)}"] = v[i]
                     elif ranking_by[1] == True and ((ranking_by[0] == False and i < n-1) or (i < (2*(n-1)))):
-                        new_dict[f"p_{i % n}"] = v[i]
+                        new_dict[f"p_{i % (n-1)}"] = v[i]
                     elif ranking_by[2] == True and ((ranking_by[0] == False and ranking_by[1] == False and i < n-1) 
                                                     or ((ranking_by[0] == False or ranking_by[1] == False) and i < (2*(n-1)))
                                                     or (i < (3*(n-1)))):
-                        new_dict[f"b_{i % n}"] = v[i]
+                        new_dict[f"b_{i % (n-1)}"] = v[i]
                     elif i == (end_ranked + 1):
                         new_dict["own"] = v[i]
                     elif i == (end_ranked + 2):
