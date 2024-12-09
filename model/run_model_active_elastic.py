@@ -10,41 +10,19 @@ import matplotlib.pyplot as plt
 from scipy.stats import levy_stable, circmean, circvar
 import pickle
 from datetime import datetime
-from shapely.geometry import LineString, Point
-from shapely.ops import nearest_points
 
 from model.run_model import RunModel
 import services.service_orientations as sorient
 import services.service_helper as shelp
 
 class ActiveElasticRunModel(RunModel):
-
-    # AE Constants
-    EPSILON = 12
-    SIGMA = 0.7
-    SIGMA_MIN = 0.7
-    SIGMA_MAX = 0.7
-    UC = 0.05
-    UMAX = 0.1
-    WMAX = np.pi / 2
-    ALPHA = 2.0
-    BETA = 0.5
-    BETA_LEADER = 4
-    GAMMA = 1.0
-    G_GAIN = 1
-    K1 = 0.6
-    K2 = 0.05
-    L_0 = 0.5
-    K_REP = 2.0
-    SENSE_RANGE = 2.0
-    B_SENSE_RANGE = 0.5
-    DES_DIST = SIGMA * 2**(1/2)
-
     """
     Performs the actual simulation of the agents interacting in the domain.
     """
     def __init__(self, domain_size, radius, noise, speed, number_particles, c_values, 
-                 add_ranking_by=[True, True, True], add_own_orientation=False, add_random=False, events=None):
+                 epsilon=12, sigma=0.7, alpha=2.0, beta=0.5, uc=0.05, umax=0.1, wmax=np.pi/2,
+                 k1=0.6, k2=0.05, add_ranking_by=[True, True, True], add_own_orientation=False, 
+                 add_random=False, events=None):
         """
         Params:
             - domain_size (tuple of floats) [optional]: the dimensions of the domain
@@ -60,8 +38,16 @@ class ActiveElasticRunModel(RunModel):
                          c_values=c_values, add_ranking_by=add_ranking_by, add_own_orientation=add_own_orientation, 
                          add_random=add_random, events=events)
         
-        self.sigmas = np.full(self.number_particles, self.SIGMA)
-
+        self.epsilon = epsilon
+        self.sigma = sigma
+        self.sigmas = np.full(self.number_particles, self.sigma)
+        self.alpha = alpha
+        self.beta = beta
+        self.uc = uc
+        self.umax = umax
+        self.wmax = wmax
+        self.k1 = k1
+        self.k2 = k2
 
     def get_parameter_summary(self):
         # TODO: add new params
@@ -109,7 +95,7 @@ class ActiveElasticRunModel(RunModel):
         x_diffs = xx1 - xx2
         y_diffs = yy1 - yy2
         distances = np.sqrt(np.multiply(x_diffs, x_diffs) + np.multiply(y_diffs, y_diffs))  
-        distances[distances > self.SENSE_RANGE] = np.inf
+        distances[distances > self.radius] = np.inf
         distances[distances == 0.0] = np.inf
         # print(f"Dists: {distances}")
         
@@ -125,7 +111,7 @@ class ActiveElasticRunModel(RunModel):
         Calculates the x and y components of the proximal control vector
 
         """  
-        forces = -self.EPSILON * (2 * (self.sigmas[:, np.newaxis] ** 4 / distances ** 5) - (self.sigmas[:, np.newaxis] ** 2 / distances ** 3))
+        forces = -self.epsilon * (2 * (self.sigmas[:, np.newaxis] ** 4 / distances ** 5) - (self.sigmas[:, np.newaxis] ** 2 / distances ** 3))
         forces[distances == np.inf] = 0.0
         # print(f"Forces: {forces}")
 
@@ -162,8 +148,8 @@ class ActiveElasticRunModel(RunModel):
         p_x, p_y = self.get_position_elements(dists, angles)
         h_x, h_y = self.get_heading_alignment_elements(headings=headings, ranked_headings=ranked_headings)
 
-        f_x = self.ALPHA * p_x + self.BETA * h_x 
-        f_y = self.ALPHA * p_y + self.BETA * h_y 
+        f_x = self.alpha * p_x + self.beta * h_x 
+        f_y = self.alpha * p_y + self.beta * h_y 
         # print(f"Fx: {f_x}")
         # print(f"Fy: {f_y}")
         
@@ -175,13 +161,13 @@ class ActiveElasticRunModel(RunModel):
         Computes u and w given the components of Fi
 
         """
-        u = self.K1 * f_x + self.UC
-        u[u > self.UMAX] = self.UMAX
+        u = self.k1 * f_x + self.uc
+        u[u > self.umax] = self.umax
         u[u < 0] = 0.0
 
-        w = self.K2 * f_y
-        w[w > self.WMAX] = self.WMAX
-        w[w < -self.WMAX] = -self.WMAX
+        w = self.k2 * f_y
+        w[w > self.wmax] = self.wmax
+        w[w < -self.wmax] = -self.wmax
 
         return u, w
 
