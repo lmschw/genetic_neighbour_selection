@@ -33,6 +33,9 @@ def calculate_mean_orientations(orientations):
     Returns:
         An array of floats containing the new, normalised orientations of every individual
     """
+    if len(orientations) == 0:
+        return orientations
+    
     mean_orientations = np.average(orientations, axis=1)
     return normalize_orientations(mean_orientations)
 
@@ -46,6 +49,9 @@ def get_differences(array, domain_size):
     Returns:
         An array of arrays of floats containing the difference between each pair of values.
     """
+    if len(array) == 0:
+        return array
+
     rij=array[:,np.newaxis,:]-array   
     rij = rij - domain_size*np.rint(rij/domain_size) #minimum image convention
     return np.sum(rij**2,axis=2)
@@ -61,6 +67,9 @@ def get_angle_differences(angles, return_absolute=False):
     Returns:
         An array of arrays of floats containing the difference between each pair of values.
     """
+    if len(angles) == 0:
+        return angles
+
     angles_positive = angles + np.pi
     diff = angles_positive[:,np.newaxis]-angles_positive   
     if return_absolute:
