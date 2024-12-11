@@ -23,6 +23,11 @@ def normalize_orientations(orientations):
     normalised = orientations/(np.sqrt(np.sum(zero_masked**2,axis=1))[:,np.newaxis])
     return normalised.data
 
+def normalize_angles(angles):
+    if len(angles) == 0:
+        return angles
+    return (angles + (2*np.pi)) % (2*np.pi)
+
 def calculate_mean_orientations(orientations):
     """
     Computes the average of the orientations for every individual.
@@ -151,3 +156,6 @@ def compute_uv_coordinates_for_list(angles):
     V = np.sin(angles)
     
     return np.column_stack((U,V))
+
+def get_unit_vectors_for_angles(angles):
+    return np.hstack((np.cos(angles)[:,None],np.sin(angles)[:,None]))
