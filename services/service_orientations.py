@@ -159,3 +159,14 @@ def compute_uv_coordinates_for_list(angles):
 
 def get_unit_vectors_for_angles(angles):
     return np.hstack((np.cos(angles)[:,None],np.sin(angles)[:,None]))
+
+def get_perpendicular_vectors(vectors):
+    new_vectors = []
+    for v in vectors:
+        if v[0] != 0:
+            new_vectors.append([-(v[1]/v[0]), 1]) 
+        elif v[1] != 0:
+            new_vectors.append([1, -(v[0]/v[1])])
+        else:
+            new_vectors.append([1,1])
+    return np.array(new_vectors)
