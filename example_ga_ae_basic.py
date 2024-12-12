@@ -33,7 +33,7 @@ if target_order == 1:
 elif target_order == 0:
     postfix = f"_test_ga_dist_disorder_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
 else:
-    postfix = f"_test_ga_dist_disorder_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
+    postfix = f"_test_ga_dist_middle_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
 
 print(postfix)
 
