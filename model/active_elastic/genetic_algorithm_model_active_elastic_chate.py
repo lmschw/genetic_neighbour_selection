@@ -4,7 +4,7 @@ import scipy.integrate as integrate
 import csv
 import matplotlib.pyplot as plt
 
-from model.run_model_active_elastic import ActiveElasticRunModel
+from model.active_elastic.run_model_active_elastic_chate import ActiveElasticRunModel
 from model.genetic_algorithm_model import GeneticAlgorithm
 import services.service_preparation as sprep
 import services.service_orientations as sorient
@@ -60,11 +60,5 @@ class GeneticAlgorithmActiveElastic(GeneticAlgorithm):
     def create_run_model(self, c_values):
         return ActiveElasticRunModel(domain_size=self.domain_size,
                                 radius=self.radius,
-                                noise=self.noise,
                                 speed=self.speed,
-                                number_particles=self.number_particles,
-                                c_values=c_values,
-                                add_ranking_by=self.add_ranking_by,
-                                add_own_orientation=self.add_own_orientation,
-                                add_random=self.add_random,
-                                events=self.events)
+                                number_particles=self.number_particles)

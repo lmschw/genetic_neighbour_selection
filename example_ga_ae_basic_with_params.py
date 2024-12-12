@@ -1,6 +1,6 @@
 import numpy as np
 
-from model.genetic_algorithm_model_active_elastic_basic import GeneticAlgorithmActiveElasticBasicWithParams
+from model.active_elastic.genetic_algorithm_model_active_elastic_basic import GeneticAlgorithmActiveElasticBasicWithParams
 import services.service_preparation as sprep
 import services.service_logging as slog
 import services.service_helper as shelp

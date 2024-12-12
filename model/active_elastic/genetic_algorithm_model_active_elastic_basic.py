@@ -4,7 +4,7 @@ import scipy.integrate as integrate
 import csv
 import matplotlib.pyplot as plt
 
-from model.run_model_active_elastic_basic import ActiveElasticRunModel
+from model.active_elastic.run_model_active_elastic_basic import ActiveElasticRunModel
 from model.genetic_algorithm_model import GeneticAlgorithm
 import services.service_preparation as sprep
 import services.service_orientations as sorient
