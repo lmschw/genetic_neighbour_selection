@@ -22,6 +22,36 @@ def test_normalize_orientations():
                 break
     assert equal == True
 
+def test_normalize_angles():
+    angles_empty = []
+    angles_within_2_pi = np.array([np.pi, 0, 0.75*np.pi, 1.8*np.pi])
+    angles_outside_2_pi = np.array([-np.pi, -0.1, 2.1*np.pi, 6*np.pi])
+
+    expected_empty = []
+    expected_within_2_pi = [np.pi, 0, 0.75*np.pi, 1.8 * np.pi]
+    expected_outside_2_pi = [np.pi, 2*np.pi-0.1, 0.1*np.pi, 0]
+
+    result_empty = sorient.normalize_angles(angles=angles_empty)
+    result_within_2_pi = sorient.normalize_angles(angles=angles_within_2_pi)
+    result_outside_2_pi = sorient.normalize_angles(angles=angles_outside_2_pi)
+
+    assert len(expected_empty) == len(result_empty)
+    assert len(expected_within_2_pi) == len(result_within_2_pi)
+    equal = True
+    for i in range(len(expected_within_2_pi)):
+        if np.absolute(expected_within_2_pi[i] - result_within_2_pi[i]) > 0.01:
+            equal = False
+            break
+    assert equal == True
+
+    assert len(expected_outside_2_pi) == len(result_outside_2_pi)
+    equal = True
+    for i in range(len(expected_outside_2_pi)):
+        if np.absolute(expected_outside_2_pi[i] - result_outside_2_pi[i]) > 0.01:
+            equal = False
+            break
+    assert equal == True
+
 def test_calculate_mean_orientations():
     orientations = []
     expected = []
@@ -160,9 +190,55 @@ def test_get_angle_differences():
                 break
     assert equal == True
 
+def test_get_differences_sqrt():
+    domain_size = (50, 50)
+    # the results of this method is the distance squared
+    positions_empty = []
+    positions_diagonal = np.array([[0, 0], [10, 10], [20, 20], [30, 30], [40, 40], [50, 50]]) # keep in mind that the domain is toroidal
+    positions_disordered = np.array([[0.3, 17], [28, 5], [15, 15], [15, 20], [50, 5], [0, 46]])
+
+    expected_empty = []
+    expected_diagonal = [[0, 14.1421, 28.2843, 28.2843, 14.1421, 0],
+                         [14.1421, 0, 14.1421, 28.2843, 28.2843, 14.1421],
+                         [28.2843, 14.1421, 0, 14.1421, 28.2843, 28.2843],
+                         [28.2843, 28.2843, 14.1421, 0, 14.1421, 28.2843],
+                         [14.1421, 28.2843, 28.2843, 14.1421, 0, 14.1421],
+                         [0, 14.1421, 28.2843, 28.2843, 14.1421, 0]]
+    expected_disordered = [[0, 25.3237, 14.8354, 15.0029, 12.0037, 21.0021],
+                           [25.3237, 0, 16.4012, 19.8494, 22, 23.7697],
+                           [14.8354, 16.4012, 0, 5, 18.0278, 24.2074],
+                           [15.003, 19.8494, 5, 0, 21.2132, 28.3019],
+                           [12.0037, 22, 18.0277, 21.2132, 0, 9],
+                           [21.0021, 23.7697, 24.2074, 28.3019, 9, 0]]
+
+    result_empty = sorient.get_differences_sqrt(array=positions_empty, domain_size=domain_size)
+    result_diagonal = sorient.get_differences_sqrt(array=positions_diagonal, domain_size=domain_size)
+    result_disordered = sorient.get_differences_sqrt(array=positions_disordered, domain_size=domain_size)
+
+    assert len(expected_empty) == len(result_empty)
+    assert len(expected_diagonal) == len(result_diagonal)
+    equal = True
+    for i in range(len(expected_diagonal)):
+        for j in range(len(expected_diagonal[0])):
+            if np.absolute(expected_diagonal[i][j] - result_diagonal[i][j]) > 0.01:
+                equal = False
+                break
+    assert equal == True
+
+    assert len(expected_disordered) == len(result_disordered)
+    equal = True
+    for i in range(len(expected_disordered)):
+        for j in range(len(expected_disordered[0])):
+            if np.absolute(expected_disordered[i][j] - result_disordered[i][j]) > 0.01:
+                equal = False
+                break
+    assert equal == True
+
 def run_all():
     test_normalize_orientations()
+    test_normalize_angles()
     test_calculate_mean_orientations()
     test_get_differences()
     test_get_angle_differences()
+    test_get_differences_sqrt()
     print("Everything passed for service_orientations")
