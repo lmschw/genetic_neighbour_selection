@@ -19,10 +19,11 @@ class ActiveElasticRunModel:
     """
     Performs the actual simulation of the agents interacting in the domain.
     """
-    def __init__(self, domain_size, number_particles, radius, speed=1, alpha=0.1, beta=0.1, spring_constant=0.1, natural_distance=1, sensing_noise=0, actuation_noise=0):
+    def __init__(self, domain_size, number_particles, radius, c_values, speed=1, alpha=0.1, beta=0.1, spring_constant=0.1, natural_distance=1, sensing_noise=0, actuation_noise=0):
         self.domain_size = np.array(domain_size)
         self.number_particles = number_particles
         self.radius = radius
+        self.c_values = c_values
         self.speed = speed
         self.alpha = alpha
         self.beta = beta
@@ -63,7 +64,9 @@ class ActiveElasticRunModel:
         delta_distance = distances_norm - self.natural_distance
         norm_div = distances / distances_norm_inf
         force_components = spring_constant_div * delta_distance * norm_div
-        force = np.sum(force_components, axis=1)
+        c_values = np.repeat(self.c_values[np.newaxis, :, np.newaxis], 2, axis=2)
+        force_components_c_values = force_components * c_values
+        force = np.sum(force_components_c_values, axis=1)
         return force
     
     def update_positions(self, positions, orientations, forces):

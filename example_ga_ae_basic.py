@@ -20,6 +20,8 @@ natural_distance = 10
 sensing_noise = sprep.get_noise_amplitude_value_for_percentage(1)
 actuation_noise = sprep.get_noise_amplitude_value_for_percentage(0.5)
 
+c_values = np.ones(n)
+
 model_params = {'number_particles': n, 'radius': radius, 'domain_size': domain_size}
 tmax = 1000
 save_path = "ae_basic_test"
@@ -27,6 +29,7 @@ save_path = "ae_basic_test"
 simulator = ActiveElasticRunModel(domain_size=domain_size, 
                                   number_particles=n, 
                                   radius=radius, 
+                                  c_values=c_values,
                                   speed=speed,
                                   alpha=alpha,
                                   beta=beta,
