@@ -83,6 +83,8 @@ def get_angle_differences(angles, return_absolute=False):
     
 
 def get_differences_sqrt(array, domain_size):
+    if len(array) == 0:
+        return array
     return np.sqrt(get_differences(array, domain_size))
 
 def remove_diagonal(matrix):
