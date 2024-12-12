@@ -1,6 +1,6 @@
 import numpy as np
 
-from model.genetic_algorithm_model_active_elastic_basic import GeneticAlgorithmActiveElasticBasic
+from model.genetic_algorithm_model_active_elastic_basic import GeneticAlgorithmActiveElasticBasicWithParams
 import services.service_preparation as sprep
 import services.service_logging as slog
 import services.service_helper as shelp
@@ -26,14 +26,14 @@ tmax = 1000
 
 bounds = [-5, 5]
 
-num_c_values = n
+num_c_values = n + 4
 
 if target_order == 1:
-    postfix = f"_test_ga_dist_order_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
+    postfix = f"_test_ga_ae_basic_with_params_order_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
 elif target_order == 0:
-    postfix = f"_test_ga_dist_disorder_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
+    postfix = f"_test_ga_ae_basic_with_params_disorder_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
 else:
-    postfix = f"_test_ga_dist_disorder_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
+    postfix = f"_test_ga_ae_basic_with_params_middle_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
 
 print(postfix)
 
@@ -46,7 +46,7 @@ slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=
 slog.initialise_log_file_with_headers(slog.create_headers(num_c_values, is_best=True, n=n, has_own=False, has_random=False, ranking_by=[False, False, False]), save_path=save_path_best_normalised)
 
 for i in range(num_iters):
-    model = GeneticAlgorithmActiveElasticBasic(radius=radius, 
+    model = GeneticAlgorithmActiveElasticBasicWithParams(radius=radius, 
                         tmax=tmax, 
                         density=density, 
                         number_particles=n,

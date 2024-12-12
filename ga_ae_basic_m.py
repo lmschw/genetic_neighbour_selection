@@ -11,7 +11,7 @@ prob_init = 0.9
 prob_mut = 0.1
 prob_intro = 0.05
 start_order = 0
-target_order = 1
+target_order = 0.5
 population_size = 30
 num_gens = 20
 num_iters = 30
@@ -29,11 +29,11 @@ bounds = [-5, 5]
 num_c_values = n
 
 if target_order == 1:
-    postfix = f"_test_ga_dist_order_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
+    postfix = f"_test_ga_ae_basic_order_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
 elif target_order == 0:
-    postfix = f"_test_ga_dist_disorder_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
+    postfix = f"_test_ga_ae_basic_disorder_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
 else:
-    postfix = f"_test_ga_dist_disorder_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
+    postfix = f"_test_ga_ae_basic_middle_n={n}_pi={prob_init}_pm={prob_mut}_g={num_gens}_pop={population_size}"
 
 print(postfix)
 

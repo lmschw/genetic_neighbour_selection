@@ -94,7 +94,6 @@ class ActiveElasticRunModel:
             positions, orientations = self.initialize_state()
         else:
             positions, orientations = initialState
-            orientations = sorient.compute_angles_for_orientations(orientations=orientations)
 
         if dt is None and tmax is not None:
             dt = 1
