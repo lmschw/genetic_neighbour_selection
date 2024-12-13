@@ -5,7 +5,7 @@ from animator.animator_matplotlib import MatplotlibAnimator
 from evaluator.evaluator_multi_comp import EvaluatorMultiAvgComp
 from model.run_model import RunModel
 from model.run_model_active_elastic import ActiveElasticRunModel
-from model.run_model_distribution import DistributionRunModel
+from model.distribution.run_model_distribution import DistributionRunModel
 import services.service_saved_run_model as ssave
 import services.service_saved_c_values as ssavedc
 import services.service_preparation as sprep

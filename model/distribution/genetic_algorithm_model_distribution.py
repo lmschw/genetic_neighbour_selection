@@ -4,7 +4,7 @@ import scipy.integrate as integrate
 import csv
 import matplotlib.pyplot as plt
 
-from model.run_model_distribution import DistributionRunModel
+from model.distribution.run_model_distribution import DistributionRunModel
 from model.genetic_algorithm_model import GeneticAlgorithm
 import services.service_preparation as sprep
 import services.service_orientations as sorient
