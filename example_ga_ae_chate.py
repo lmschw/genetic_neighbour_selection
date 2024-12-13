@@ -1,10 +1,11 @@
 import numpy as np
 
-from model.genetic_algorithm_model_active_elastic_chate import GeneticAlgorithmActiveElastic
-from model.run_model_active_elastic_chate import ActiveElasticRunModel
+from model.active_elastic.genetic_algorithm_model_active_elastic_chate import GeneticAlgorithmActiveElastic
+from model.active_elastic.run_model_active_elastic_chate import ActiveElasticRunModel
 import services.service_preparation as sprep
 import services.service_logging as slog
 import services.service_helper as shelp
+import services.service_orientations as sorient
 
 from animator.animator_2d import Animator2D
 from animator.animator_matplotlib import MatplotlibAnimator
@@ -31,6 +32,8 @@ simulator = ActiveElasticRunModel(domain_size=domain_size,
 
 simulation_data = simulator.simulate(tmax=tmax)
 times, positions, orientations = simulation_data
+
+print(f"order={sorient.compute_global_order(orientations=orientations[-1])}")
 
 animator = MatplotlibAnimator(simulation_data, (domain_size[0], domain_size[1], 100), red_indices=[0])
 
