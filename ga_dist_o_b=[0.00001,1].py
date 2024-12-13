@@ -1,7 +1,7 @@
 import numpy as np
 
 from model.run_model import RunModel
-from model.genetic_algorithm_model_distribution import GeneticAlgorithmDistribution
+from model.distribution.genetic_algorithm_model_distribution import GeneticAlgorithmDistribution
 import services.service_preparation as sprep
 import services.service_logging as slog
 import services.service_helper as shelp
